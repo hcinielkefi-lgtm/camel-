@@ -1,0 +1,1862 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Banking Integration Framework - Complete POC with Kaoto</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github-dark.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@9.4.0/dist/mermaid.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --accent: #e74c3c;
+            --light: #ecf0f1;
+            --dark: #34495e;
+            --success: #27ae60;
+            --warning: #f39c12;
+            --quarkus: #4695eb;
+            --camel: #ff7e47;
+            --kafka: #000000;
+            --postgres: #336791;
+            --kubernetes: #326ce5;
+            --poc: #9b59b6;
+            --kaoto: #6c5ce7;
+            --surface: #ffffff;
+            --surface-alt: #f8f9fa;
+            --text-primary: #212529;
+            --text-secondary: #495057;
+            --border: #dee2e6;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-primary);
+            background: var(--surface-alt);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--dark) 100%);
+            color: white;
+            padding: 2.5rem 0;
+            text-align: center;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        nav {
+            background-color: var(--dark);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        nav ul {
+            display: flex;
+            justify-content: center;
+            list-style: none;
+            padding: 0.8rem 0;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        nav li {
+            margin: 0;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.6rem 1.2rem;
+            border-radius: 6px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        nav a i {
+            margin-right: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        nav a:hover, nav a:focus {
+            background-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+            outline: none;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        section {
+            padding: 2.5rem 0;
+        }
+
+        h2 {
+            color: var(--primary);
+            margin-bottom: 1.8rem;
+            padding-bottom: 0.8rem;
+            border-bottom: 2px solid var(--secondary);
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            font-size: 1.8rem;
+        }
+
+        h2 i {
+            margin-right: 0.8rem;
+            color: var(--secondary);
+        }
+
+        h3 {
+            color: var(--dark);
+            margin: 2rem 0 1.2rem 0;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            font-size: 1.5rem;
+        }
+
+        h3 i {
+            margin-right: 0.6rem;
+            color: var(--secondary);
+        }
+
+        h4 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        p {
+            margin-bottom: 1.2rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        .architecture-diagram {
+            background: var(--surface);
+            border-radius: 12px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+            padding: 2rem;
+            margin: 2.5rem 0;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .diagram-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .diagram-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn {
+            padding: 0.6rem 1.2rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            font-size: 0.9rem;
+        }
+
+        .btn i {
+            margin-right: 0.5rem;
+        }
+
+        .btn-primary {
+            background-color: var(--secondary);
+            color: white;
+        }
+
+        .btn-primary:hover, .btn-primary:focus {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+            outline: none;
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--secondary);
+            color: var(--secondary);
+        }
+
+        .btn-outline:hover, .btn-outline:focus {
+            background-color: var(--secondary);
+            color: white;
+            outline: none;
+        }
+
+        .btn-poc {
+            background-color: var(--poc);
+            color: white;
+        }
+
+        .btn-poc:hover, .btn-poc:focus {
+            background-color: #8e44ad;
+            transform: translateY(-2px);
+            outline: none;
+        }
+
+        .btn-kaoto {
+            background-color: var(--kaoto);
+            color: white;
+        }
+
+        .btn-kaoto:hover, .btn-kaoto:focus {
+            background-color: #5649c0;
+            transform: translateY(-2px);
+            outline: none;
+        }
+
+        .mermaid {
+            overflow: auto;
+            padding: 1.5rem;
+            background: var(--surface-alt);
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            min-height: 400px;
+        }
+
+        .architecture-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.8rem;
+            margin: 2rem 0;
+        }
+
+        .architecture-card {
+            background: var(--surface);
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            padding: 1.8rem;
+            transition: all 0.3s;
+            border-top: 4px solid var(--secondary);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .architecture-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
+        }
+
+        .architecture-card h4 {
+            color: var(--primary);
+            margin-bottom: 1.2rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .architecture-card h4 i {
+            margin-right: 0.6rem;
+            color: var(--secondary);
+        }
+
+        .tech-pill {
+            display: inline-block;
+            padding: 0.4rem 0.9rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin: 0.3rem 0.3rem 0 0;
+            color: white;
+        }
+
+        .pill-quarkus { background-color: var(--quarkus); }
+        .pill-camel { background-color: var(--camel); }
+        .pill-kafka { background-color: var(--kafka); color: white; }
+        .pill-postgres { background-color: var(--postgres); color: white; }
+        .pill-kubernetes { background-color: var(--kubernetes); color: white; }
+        .pill-poc { background-color: var(--poc); color: white; }
+        .pill-kaoto { background-color: var(--kaoto); color: white; }
+
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.2rem;
+            margin: 1.2rem 0;
+            padding: 1.2rem;
+            background: var(--surface);
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-right: 1rem;
+        }
+
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+            margin-right: 0.6rem;
+        }
+
+        .component-details {
+            background: var(--surface);
+            border-radius: 10px;
+            padding: 2rem;
+            margin: 2rem 0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .component-list {
+            list-style: none;
+        }
+
+        .component-list li {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+        }
+
+        .component-list li:last-child {
+            border-bottom: none;
+        }
+
+        .component-list i {
+            margin-right: 0.8rem;
+            color: var(--secondary);
+        }
+
+        footer {
+            background-color: var(--primary);
+            color: white;
+            text-align: center;
+            padding: 2.5rem 0;
+            margin-top: 4rem;
+        }
+
+        .code-block {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            border-radius: 8px;
+            padding: 1.2rem;
+            margin: 1.5rem 0;
+            overflow-x: auto;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+            position: relative;
+        }
+
+        .code-block pre {
+            margin: 0;
+            padding: 0;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.8rem;
+            color: #aaa;
+            font-size: 0.85rem;
+        }
+
+        .copy-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: #aaa;
+            padding: 0.3rem 0.6rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.2s;
+        }
+
+        .copy-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        .step-container {
+            counter-reset: step-counter;
+            margin: 2rem 0;
+        }
+
+        .step-card {
+            background: var(--surface);
+            border-radius: 10px;
+            padding: 2rem;
+            margin-bottom: 1.8rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            position: relative;
+            padding-left: 80px;
+        }
+
+        .step-card:before {
+            counter-increment: step-counter;
+            content: counter(step-counter);
+            position: absolute;
+            left: 25px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 45px;
+            height: 45px;
+            background: var(--secondary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.3rem;
+        }
+
+        .poc-highlight {
+            background: rgba(155, 89, 182, 0.08);
+            border-left: 4px solid var(--poc);
+            padding: 1.5rem;
+            margin: 1.8rem 0;
+            border-radius: 6px;
+        }
+
+        .poc-highlight h4 {
+            color: var(--poc);
+            margin-bottom: 1rem;
+        }
+
+        .poc-highlight ul {
+            padding-left: 1.5rem;
+        }
+
+        .poc-highlight li {
+            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
+        }
+
+        /* Collapsible sections */
+        .collapsible {
+            cursor: pointer;
+            position: relative;
+            padding-right: 40px;
+        }
+
+        .collapsible-content {
+            overflow: visible;
+            transition: none;
+        }
+
+        .collapsible-content:not(.active) {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+
+        .collapsible-icon {
+            transition: transform 0.3s ease;
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .collapsible.active .collapsible-icon {
+            transform: translateY(-50%) rotate(90deg);
+        }
+
+        /* Loading indicator for diagrams */
+        .diagram-loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 400px;
+            color: var(--text-secondary);
+        }
+
+        .diagram-loading i {
+            margin-right: 0.5rem;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            nav ul {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 0.3rem;
+            }
+
+            nav li {
+                margin: 0.2rem 0;
+            }
+
+            nav a {
+                justify-content: center;
+            }
+
+            .diagram-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .step-card {
+                padding: 1.5rem;
+                padding-left: 65px;
+            }
+
+            .step-card:before {
+                left: 15px;
+                width: 40px;
+                height: 40px;
+                font-size: 1.1rem;
+            }
+
+            h2 {
+                font-size: 1.6rem;
+            }
+
+            h3 {
+                font-size: 1.3rem;
+            }
+
+            .architecture-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .component-details,
+            .architecture-diagram {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1><i class="fas fa-project-diagram"></i> Banking Integration Framework with Kaoto</h1>
+            <p>Interactive visualization and development of architectures and components for payment processing systems using Kaoto, Quarkus, and Camel K</p>
+        </div>
+    </header>
+
+    <nav>
+        <ul>
+            <li><a href="#" class="tab-link" data-tab="global"><i class="fas fa-globe"></i> Global Architecture</a></li>
+            <li><a href="#" class="tab-link" data-tab="framework"><i class="fas fa-cube"></i> Framework</a></li>
+            <li><a href="#" class="tab-link" data-tab="payment"><i class="fas fa-credit-card"></i> Payment Handling</a></li>
+            <li><a href="#" class="tab-link" data-tab="migration"><i class="fas fa-exchange-alt"></i> Migration</a></li>
+            <li><a href="#" class="tab-link" data-tab="technologies"><i class="fas fa-microchip"></i> Technologies</a></li>
+            <li><a href="#" class="tab-link" data-tab="flow"><i class="fas fa-stream"></i> Data Flow</a></li>
+            <li><a href="#" class="tab-link active-nav" data-tab="poc"><i class="fas fa-flask"></i> POC Implementation</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <!-- POC Implementation Section -->
+        <section id="poc" class="tab-content active">
+            <h2 class="collapsible active">
+                <i class="fas fa-flask"></i> POC Implementation with Kaoto
+                <i class="fas fa-chevron-right collapsible-icon"></i>
+            </h2>
+
+            <div class="collapsible-content active">
+                <p>This section provides a practical Proof of Concept implementation for the banking integration framework using Kaoto for visual integration development, demonstrating how to process payment files from MQ Series, transform them to the Common Data Model (CDM), and route them to core banking systems.</p>
+
+                <div class="architecture-diagram">
+                    <div class="diagram-header">
+                        <h3 class="collapsible active">
+                            POC Architecture: MQ Series to Core Banking Integration with Kaoto
+                            <i class="fas fa-chevron-right collapsible-icon"></i>
+                        </h3>
+                        <div class="diagram-actions">
+                            <button class="btn btn-primary" onclick="zoomIn('pocDiagram')">
+                                <i class="fas fa-search-plus"></i> Zoom In
+                            </button>
+                            <button class="btn btn-outline" onclick="resetZoom('pocDiagram')">
+                                <i class="fas fa-sync"></i> Reset
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="collapsible-content active">
+                        <div class="mermaid" id="pocDiagram">
+                            graph TB
+                                %% POC Components
+                                subgraph "MQ Series Input"
+                                    MQ[IBM MQ Series]
+                                    MQ_KAMELET[MQ Connector Kamelet]
+                                end
+                                subgraph "Kafka Topics"
+                                    MQ_INPUT[mq-payment-input]
+                                    CDM_VALIDATED[cdm-validated]
+                                    CORE_OUTPUT[core-banking-output]
+                                    DLQ[dead-letter-queue]
+                                end
+                                subgraph "Kaoto Designed Integrations"
+                                    MQ_PARSER[MQ Message Parser]
+                                    HTTP_CALLER[HTTP Service Caller]
+                                end
+                                subgraph "Quarkus Microservices"
+                                    CDM_TRANSFORMER[CDM Transformer]
+                                    VALIDATOR[Payment Validator]
+                                end
+                                subgraph "Routing & Processing"
+                                    ROUTER[Payment Router]
+                                    CORE_ADAPTER[Core Banking Adapter]
+                                end
+                                subgraph "Core Banking Systems"
+                                    CORE_BANKING[Core Banking System]
+                                end
+                                subgraph "Monitoring & Logging"
+                                    LOGGER[Structured Logger]
+                                    MONITOR[Monitoring Dashboard]
+                                    DB[(PostgreSQL)]
+                                end
+                                %% Connections
+                                MQ --> MQ_KAMELET
+                                MQ_KAMELET --> MQ_INPUT
+                                MQ_INPUT --> MQ_PARSER
+                                MQ_PARSER -->|HTTP| CDM_TRANSFORMER
+                                CDM_TRANSFORMER -->|HTTP| HTTP_CALLER
+                                HTTP_CALLER --> CDM_VALIDATED
+                                CDM_VALIDATED -->|HTTP| VALIDATOR
+                                VALIDATOR --> ROUTER
+                                ROUTER --> CORE_ADAPTER
+                                CORE_ADAPTER --> CORE_OUTPUT
+                                CORE_OUTPUT --> CORE_BANKING
+                                VALIDATOR --> DLQ
+                                ROUTER --> DLQ
+                                CORE_ADAPTER --> DLQ
+                                MQ_PARSER --> LOGGER
+                                CDM_TRANSFORMER --> LOGGER
+                                VALIDATOR --> LOGGER
+                                ROUTER --> LOGGER
+                                CORE_ADAPTER --> LOGGER
+                                LOGGER --> DB
+                                LOGGER --> MONITOR
+                        </div>
+                    </div>
+                </div>
+
+                <div class="component-details">
+                    <h3 class="collapsible active">
+                        <i class="fas fa-cogs"></i> POC Scenario: MQ Series to Core Banking with Kaoto
+                        <i class="fas fa-chevron-right collapsible-icon"></i>
+                    </h3>
+
+                    <div class="collapsible-content active">
+                        <p>This POC demonstrates a complete flow for processing payment files from IBM MQ Series, transforming them to the Common Data Model format, validating the payments, and routing them to the core banking system using Kaoto for visual integration development.</p>
+                        <div class="poc-highlight">
+                            <h4><i class="fas fa-info-circle"></i> POC Objectives</h4>
+                            <ul>
+                                <li>Validate the integration framework architecture</li>
+                                <li>Test end-to-end payment processing flow</li>
+                                <li>Demonstrate transformation to Common Data Model</li>
+                                <li>Verify error handling and dead letter queue functionality</li>
+                                <li>Test monitoring and logging capabilities</li>
+                                <li>Utilize Kaoto for visual integration development</li>
+                            </ul>
+                        </div>
+                        <div class="poc-highlight">
+                            <h4><i class="fas fa-cogs"></i> Technology Stack</h4>
+                            <ul>
+                                <li><span class="tech-pill pill-kaoto">Kaoto</span> for visual integration development</li>
+                                <li><span class="tech-pill pill-camel">Camel K</span> for routing and orchestration</li>
+                                <li><span class="tech-pill pill-quarkus">Quarkus</span> for microservices (CDM transformation and validation)</li>
+                                <li><span class="tech-pill pill-kafka">Kafka</span> for message brokering</li>
+                                <li><span class="tech-pill pill-postgres">PostgreSQL</span> for logging and auditing</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step-container">
+                    <h3 class="collapsible active">
+                        <i class="fas fa-list-ol"></i> Implementation Steps
+                        <i class="fas fa-chevron-right collapsible-icon"></i>
+                    </h3>
+
+                    <div class="collapsible-content active">
+                        <div class="step-card">
+                            <h4>Environment Setup with Kaoto</h4>
+                            <p>Set up the development environment with all required tools and dependencies, including Kaoto for visual integration development.</p>
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span>Terminal Commands</span>
+                                    <button class="copy-btn" onclick="copyCode(this)">
+                                        <i class="fas fa-copy"></i> Copy
+                                    </button>
+                                </div>
+                                <pre><code class="language-bash"># Install required tools
+brew install kubectl helm minikube git java maven node
+
+# Install Quarkus CLI
+brew install quarkusio/tap/quarkus
+
+# Install Kaoto CLI
+npm install -g @kaoto/kaoto
+
+# Start Minikube cluster
+minikube start --cpus=4 --memory=8192 --addons=ingress
+
+# Install Camel K operator
+kubectl create namespace camel-k
+helm repo add camel-k https://apache.github.io/camel-k/charts
+helm install camel-k camel-k/camel-k -n camel-k
+
+# Install Strimzi Kafka operator
+kubectl create namespace kafka
+helm repo add strimzi https://strimzi.io/charts/
+helm install strimzi-kafka strimzi/strimzi-kafka-operator -n kafka
+
+# Verify installations
+quarkus --version
+kaoto --version
+kubectl version --client
+minikube version
+mvn --version</code></pre>
+                            </div>
+                        </div>
+
+                        <div class="step-card">
+                            <h4>Kafka Cluster Deployment</h4>
+                            <p>Deploy a Kafka cluster for message brokering between components.</p>
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span>kafka-cluster.yaml</span>
+                                    <button class="copy-btn" onclick="copyCode(this)">
+                                        <i class="fas fa-copy"></i> Copy
+                                    </button>
+                                </div>
+                                <pre><code class="language-yaml">apiVersion: kafka.strimzi.io/v1beta2
+kind: Kafka
+metadata:
+  name: banking-kafka-cluster
+  namespace: kafka
+spec:
+  kafka:
+    version: 3.4.0
+    replicas: 3
+    listeners:
+      - name: plain
+        port: 9092
+        type: internal
+        tls: false
+      - name: tls
+        port: 9093
+        type: internal
+        tls: true
+    config:
+      offsets.topic.replication.factor: 3
+      transaction.state.log.replication.factor: 3
+      transaction.state.log.min.isr: 2
+      log.message.format.version: "3.4"
+    storage:
+      type: jbod
+      volumes:
+      - id: 0
+        type: persistent-claim
+        size: 100Gi
+        deleteClaim: false
+  zookeeper:
+    replicas: 3
+    storage:
+      type: persistent-claim
+      size: 100Gi
+      deleteClaim: false
+  entityOperator:
+    topicOperator: {}
+    userOperator: {}</code></pre>
+                            </div>
+                        </div>
+
+                        <div class="step-card">
+                            <h4>Develop Integrations with Kaoto</h4>
+                            <p>Use Kaoto to visually design and develop Camel K integrations.</p>
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span>Start Kaoto and Design Integration</span>
+                                    <button class="copy-btn" onclick="copyCode(this)">
+                                        <i class="fas fa-copy"></i> Copy
+                                    </button>
+                                </div>
+                                <pre><code class="language-bash"># Start Kaoto
+kaoto start
+
+# Open Kaoto in your browser
+open http://localhost:8080
+
+# Design your integration visually:
+# 1. Create a new integration
+# 2. Add an IBM MQ component as the source
+# 3. Add a Kafka component as the target
+# 4. Configure the connection details
+# 5. Save the integration as mq-to-kafka-integration.yaml
+
+# Deploy the integration to your cluster
+kubectl apply -f mq-to-kafka-integration.yaml</code></pre>
+                            </div>
+                            <div class="poc-highlight">
+                                <h4><i class="fas fa-info-circle"></i> Kaoto Integration Design</h4>
+                                <p>Use Kaoto's visual interface to:</p>
+                                <ul>
+                                    <li>Drag and drop components to create your integration flow</li>
+                                    <li>Configure each component's properties</li>
+                                    <li>Connect components to define the message flow</li>
+                                    <li>Save and deploy your integration directly to Kubernetes</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="step-card">
+                            <h4>Kaoto Integration File</h4>
+                            <p>Example of a Kaoto-designed integration file for MQ to Kafka routing.</p>
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span>mq-to-kafka-integration.yaml</span>
+                                    <button class="copy-btn" onclick="copyCode(this)">
+                                        <i class="fas fa-copy"></i> Copy
+                                    </button>
+                                </div>
+                                <pre><code class="language-yaml">apiVersion: camel.apache.org/v1
+kind: Integration
+metadata:
+  name: mq-to-kafka-integration
+  annotations:
+    kaoto/designer: "true"
+spec:
+  flows:
+  - from:
+      uri: "jms:queue:PAYMENT.INBOUND"
+      parameters:
+        connectionFactory: "#mqConnectionFactory"
+      steps:
+        - log:
+            message: "Received payment message from MQ: ${body}"
+        - to: "kafka:mq-payment-input?brokers={{kafka.brokers}}"
+        - log:
+            message: "Message sent to Kafka topic mq-payment-input"
+  traits:
+    container:
+      image: "quay.io/myorg/mq-kafka-integration:1.0.0"
+    camel:
+      properties:
+        - "kafka.brokers=banking-kafka-cluster-kafka-bootstrap.kafka:9092"
+        - "mq.host=mq-series-host"
+        - "mq.port=1414"
+        - "mq.queueManager=QM1"
+        - "mq.channel=SYSTEM.DEF.SVRCONN"</code></pre>
+                            </div>
+                        </div>
+
+                        <div class="step-card">
+                            <h4>Kaoto Integration for Quarkus Microservices</h4>
+                            <p>Use Kaoto to design integrations that call Quarkus microservices.</p>
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span>kafka-to-quarkus-integration.yaml</span>
+                                    <button class="copy-btn" onclick="copyCode(this)">
+                                        <i class="fas fa-copy"></i> Copy
+                                    </button>
+                                </div>
+                                <pre><code class="language-yaml">apiVersion: camel.apache.org/v1
+kind: Integration
+metadata:
+  name: kafka-to-quarkus-integration
+  annotations:
+    kaoto/designer: "true"
+spec:
+  flows:
+  - from:
+      uri: "kafka:mq-payment-input"
+      parameters:
+        brokers: "{{kafka.brokers}}"
+      steps:
+        - setHeader:
+            name: "Content-Type"
+            constant: "application/xml"
+        - log:
+            message: "Calling CDM Transformer microservice with message: ${body}"
+        - to: "http://cdm-transformer-service/transform"
+        - log:
+            message: "Response from CDM Transformer: ${body}"
+        - to: "kafka:cdm-validated?brokers={{kafka.brokers}}"
+
+  - from:
+      uri: "kafka:cdm-validated"
+      parameters:
+        brokers: "{{kafka.brokers}}"
+      steps:
+        - setHeader:
+            name: "Content-Type"
+            constant: "application/json"
+        - log:
+            message: "Calling CDM Validator microservice with message: ${body}"
+        - to: "http://cdm-validator-service/validate"
+        - log:
+            message: "Response from CDM Validator: ${body}"
+        - choice:
+            when:
+              - simple: "${body} != null"
+              - to: "kafka:validated-payments"
+            otherwise:
+              - to: "kafka:dead-letter-queue"
+  traits:
+    container:
+      image: "quay.io/myorg/kafka-quarkus-integration:1.0.0"
+    camel:
+      properties:
+        - "kafka.brokers=banking-kafka-cluster-kafka-bootstrap.kafka:9092"</code></pre>
+                            </div>
+                        </div>
+
+                        <div class="step-card">
+                            <h4>Quarkus Microservices Development</h4>
+                            <p>Develop Quarkus microservices for CDM transformation and validation.</p>
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span>Create and Build Quarkus Projects</span>
+                                    <button class="copy-btn" onclick="copyCode(this)">
+                                        <i class="fas fa-copy"></i> Copy
+                                    </button>
+                                </div>
+                                <pre><code class="language-bash"># Create CDM Transformer microservice
+quarkus create app org.banking.cdm:cdm-transformer-service --no-code
+cd cdm-transformer-service
+# Add required extensions
+quarkus ext add resteasy-jackson rest-client xmlb
+
+# Create CDM Validator microservice
+cd ..
+quarkus create app org.banking.cdm:cdm-validator-service --no-code
+cd cdm-validator-service
+# Add required extensions
+quarkus ext add resteasy-jackson
+
+# Build both microservices
+cd ..
+mvn clean package -DskipTests
+
+# Build Docker images
+docker build -f cdm-transformer-service/src/main/docker/Dockerfile.jvm -t quay.io/myorg/cdm-transformer-service:1.0.0 .
+docker build -f cdm-validator-service/src/main/docker/Dockerfile.jvm -t quay.io/myorg/cdm-validator-service:1.0.0 .
+
+# Push Docker images to registry
+docker push quay.io/myorg/cdm-transformer-service:1.0.0
+docker push quay.io/myorg/cdm-validator-service:1.0.0</code></pre>
+                            </div>
+                        </div>
+
+                        <div class="step-card">
+                            <h4>Quarkus Microservices Implementation</h4>
+                            <p>Implement the Quarkus microservices for CDM transformation and validation.</p>
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span>CDMTransformerResource.java</span>
+                                    <button class="copy-btn" onclick="copyCode(this)">
+                                        <i class="fas fa-copy"></i> Copy
+                                    </button>
+                                </div>
+                                <pre><code class="language-java">package org.banking.cdm.transformer;
+
+import javax.ws.rs.Consumes;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
+@Path("/transform")
+public class CDMTransformerResource {
+
+    @POST
+    @Consumes(MediaType.APPLICATION_XML)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response transformToCDM(String pacs002Message) {
+        try {
+            CDM cdm = CDMTransformer.transformToCDM(pacs002Message);
+            return Response.ok(cdm).build();
+        } catch (Exception e) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("{\"error\": \"" + e.getMessage() + "\"}")
+                    .build();
+        }
+    }
+}</code></pre>
+                            </div>
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span>CDMTransformer.java</span>
+                                    <button class="copy-btn" onclick="copyCode(this)">
+                                        <i class="fas fa-copy"></i> Copy
+                                    </button>
+                                </div>
+                                <pre><code class="language-java">package org.banking.cdm.transformer;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import org.banking.iso20022.pacs002.FIToFIPmtStsRpt;
+
+public class CDMTransformer {
+
+    public static CDM transformToCDM(String pacs002Xml) throws Exception {
+        XmlMapper xmlMapper = new XmlMapper();
+        FIToFIPmtStsRpt pacs002Message = xmlMapper.readValue(pacs002Xml, FIToFIPmtStsRpt.class);
+
+        CDM cdm = new CDM();
+
+        // Basic message information
+        cdm.setCdmVersion("2.0");
+        cdm.setMessageFamily("PACS");
+        cdm.setMessageType("STATUS");
+        cdm.setMessageId(pacs002Message.getGrpHdr().getMsgId());
+        cdm.setCreationDateTime(pacs002Message.getGrpHdr().getCreDtTm().toString());
+
+        // Business context
+        CDM.BusinessContext businessContext = new CDM.BusinessContext();
+        businessContext.setBusinessService("sepa.credit.transfer");
+        businessContext.setContextType("FINANCIAL_INSTITUTION");
+        businessContext.setBatchProcessing(false);
+        cdm.setBusinessContext(businessContext);
+
+        // Parties information
+        CDM.Parties parties = new CDM.Parties();
+
+        // Initiating Party
+        CDM.Party initiatingParty = new CDM.Party();
+        initiatingParty.setType("BANK");
+        initiatingParty.setBic(pacs002Message.getGrpHdr().getInstgAgt().getFinInstnId().getBICFI());
+        parties.setInitiatingParty(initiatingParty);
+
+        // Debtor
+        CDM.Party debtor = new CDM.Party();
+        debtor.setType("CORPORATE");
+        debtor.setName(pacs002Message.getTxInfAndSts().get(0).getOrgnlTxRef().getDbtr().getNm());
+
+        CDM.Account debtorAccount = new CDM.Account();
+        debtorAccount.setIban(pacs002Message.getTxInfAndSts().get(0).getOrgnlTxRef().getDbtrAcct().getId().getIBAN());
+        debtorAccount.setCurrency(pacs002Message.getTxInfAndSts().get(0).getOrgnlTxRef().getAmt().getInstdAmt().getCcy());
+        debtor.setAccount(debtorAccount);
+
+        CDM.Agent debtorAgent = new CDM.Agent();
+        debtorAgent.setBic(pacs002Message.getTxInfAndSts().get(0).getOrgnlTxRef().getDbtrAgt().getFinInstnId().getBICFI());
+        debtor.setAgent(debtorAgent);
+
+        CDM.Address debtorAddress = new CDM.Address();
+        debtorAddress.setCountry(pacs002Message.getTxInfAndSts().get(0).getOrgnlTxRef().getDbtr().getPstlAdr().getCtry());
+        debtorAddress.setAddressLines(pacs002Message.getTxInfAndSts().get(0).getOrgnlTxRef().getDbtr().getPstlAdr().getAdrLine());
+        debtor.setAddress(debtorAddress);
+
+        parties.setDebtor(debtor);
+
+        // Creditor
+        CDM.Party creditor = new CDM.Party();
+        creditor.setType("CORPORATE");
+        creditor.setName(pacs002Message.getTxInfAndSts().get(0).getOrgnlTxRef().getCdtr().getNm());
+
+        CDM.Account creditorAccount = new CDM.Account();
+        creditorAccount.setIban(pacs002Message.getTxInfAndSts().get(0).getOrgnlTxRef().getCdtrAcct().getId().getIBAN());
+        creditorAccount.setCurrency(pacs002Message.getTxInfAndSts().get(0).getOrgnlTxRef().getAmt().getInstdAmt().getCcy());
+        creditor.setAccount(creditorAccount);
+
+        CDM.Agent creditorAgent = new CDM.Agent();
+        creditorAgent.setBic(pacs002Message.getTxInfAndSts().get(0).getOrgnlTxRef().getCdtrAgt().getFinInstnId().getBICFI());
+        creditor.setAgent(creditorAgent);
+
+        CDM.Address creditorAddress = new CDM.Address();
+        creditorAddress.setCountry(pacs002Message.getTxInfAndSts().get(0).getOrgnlTxRef().getCdtr().getPstlAdr().getCtry());
+        creditorAddress.setAddressLines(pacs002Message.getTxInfAndSts().get(0).getOrgnlTxRef().getCdtr().getPstlAdr().getAdrLine());
+        creditor.setAddress(creditorAddress);
+
+        parties.setCreditor(creditor);
+
+        cdm.setParties(parties);
+
+        // Payment information
+        CDM.PaymentInformation paymentInformation = new CDM.PaymentInformation();
+        paymentInformation.setPaymentId(pacs002Message.getTxInfAndSts().get(0).getOrgnlEndToEndId());
+        paymentInformation.setOriginalMessageId(pacs002Message.getOrgnlGrpInfAndSts().getOrgnlMsgId());
+        paymentInformation.setOriginalMessageType(pacs002Message.getOrgnlGrpInfAndSts().getOrgnlMsgNmId());
+        paymentInformation.setEndToEndId(pacs002Message.getTxInfAndSts().get(0).getOrgnlEndToEndId());
+        paymentInformation.setTransactionId(pacs002Message.getTxInfAndSts().get(0).getOrgnlTxId());
+
+        CDM.Amounts amounts = new CDM.Amounts();
+        amounts.setInstructedAmount(Double.parseDouble(pacs002Message.getTxInfAndSts().get(0).getOrgnlTxRef().getAmt().getInstdAmt().getValue()));
+        amounts.setCurrency(pacs002Message.getTxInfAndSts().get(0).getOrgnlTxRef().getAmt().getInstdAmt().getCcy());
+        paymentInformation.setAmounts(amounts);
+
+        CDM.Dates dates = new CDM.Dates();
+        dates.setRequestedExecutionDate(pacs002Message.getTxInfAndSts().get(0).getOrgnlTxRef().getReqdExctnDt());
+        dates.setAcceptanceDateTime(pacs002Message.getTxInfAndSts().get(0).getAccptncDtTm().toString());
+        paymentInformation.setDates(dates);
+
+        CDM.PaymentType paymentType = new CDM.PaymentType();
+        paymentType.setServiceLevel("SEPA");
+        paymentType.setLocalInstrument("CORE");
+        paymentInformation.setPaymentType(paymentType);
+
+        paymentInformation.setChargeBearer("SHAR");
+        paymentInformation.setClearingChannel("RTGS");
+
+        cdm.setPaymentInformation(paymentInformation);
+
+        // Status information
+        CDM.StatusInformation statusInformation = new CDM.StatusInformation();
+        statusInformation.setTransactionStatus(pacs002Message.getTxInfAndSts().get(0).getTxSts());
+        statusInformation.setGroupStatus(pacs002Message.getOrgnlGrpInfAndSts().getGrpSts());
+
+        CDM.StatusReason statusReason = new CDM.StatusReason();
+        statusReason.setCode(pacs002Message.getTxInfAndSts().get(0).getStsRsnInf().getRsn().getCd());
+        statusReason.setAdditionalInformation(pacs002Message.getTxInfAndSts().get(0).getStsRsnInf().getAddtlInf());
+        statusInformation.setStatusReason(statusReason);
+
+        cdm.setStatusInformation(statusInformation);
+
+        // Additional data
+        CDM.AdditionalData additionalData = new CDM.AdditionalData();
+
+        CDM.RemittanceInformation remittanceInformation = new CDM.RemittanceInformation();
+        remittanceInformation.setUnstructured(pacs002Message.getTxInfAndSts().get(0).getOrgnlTxRef().getRmtInf().getUstrd());
+        additionalData.setRemittanceInformation(remittanceInformation);
+
+        cdm.setAdditionalData(additionalData);
+
+        // Metadata
+        CDM.Metadata metadata = new CDM.Metadata();
+        metadata.setVersion("pacs.002.001.12");
+        metadata.setOriginator(pacs002Message.getGrpHdr().getInstgAgt().getFinInstnId().getBICFI());
+        metadata.setFileFormat("XML");
+        metadata.setValidationStatus("VALID");
+        cdm.setMetadata(metadata);
+
+        return cdm;
+    }
+}</code></pre>
+                            </div>
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span>CDMValidatorResource.java</span>
+                                    <button class="copy-btn" onclick="copyCode(this)">
+                                        <i class="fas fa-copy"></i> Copy
+                                    </button>
+                                </div>
+                                <pre><code class="language-java">package org.banking.cdm.validator;
+
+import javax.ws.rs.Consumes;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
+@Path("/validate")
+public class CDMValidatorResource {
+
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response validateCDM(CDM cdm) {
+        try {
+            CDMValidator.validate(cdm);
+            return Response.ok(cdm).build();
+        } catch (Exception e) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("{\"error\": \"" + e.getMessage() + "\"}")
+                    .build();
+        }
+    }
+}</code></pre>
+                            </div>
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span>CDMValidator.java</span>
+                                    <button class="copy-btn" onclick="copyCode(this)">
+                                        <i class="fas fa-copy"></i> Copy
+                                    </button>
+                                </div>
+                                <pre><code class="language-java">package org.banking.cdm.validator;
+
+public class CDMValidator {
+
+    public static void validate(CDM cdm) throws Exception {
+        if (cdm == null) {
+            throw new Exception("CDM message is null");
+        }
+
+        if (cdm.getParties() == null || cdm.getParties().getDebtor() == null || cdm.getParties().getCreditor() == null) {
+            throw new Exception("Parties information is missing");
+        }
+
+        if (cdm.getParties().getDebtor().getAccount() == null || cdm.getParties().getDebtor().getAccount().getIban() == null) {
+            throw new Exception("Debtor account information is missing");
+        }
+
+        if (cdm.getParties().getCreditor().getAccount() == null || cdm.getParties().getCreditor().getAccount().getIban() == null) {
+            throw new Exception("Creditor account information is missing");
+        }
+
+        if (cdm.getPaymentInformation() == null || cdm.getPaymentInformation().getAmounts() == null) {
+            throw new Exception("Payment information is missing");
+        }
+
+        if (cdm.getPaymentInformation().getAmounts().getInstructedAmount() <= 0) {
+            throw new Exception("Instructed amount must be greater than zero");
+        }
+
+        if (cdm.getStatusInformation() == null || cdm.getStatusInformation().getTransactionStatus() == null) {
+            throw new Exception("Status information is missing");
+        }
+    }
+}</code></pre>
+                            </div>
+                        </div>
+
+                        <div class="step-card">
+                            <h4>Quarkus Microservices Deployment</h4>
+                            <p>Deploy the Quarkus microservices for CDM transformation and validation.</p>
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span>quarkus-cdm-transformer-deployment.yaml</span>
+                                    <button class="copy-btn" onclick="copyCode(this)">
+                                        <i class="fas fa-copy"></i> Copy
+                                    </button>
+                                </div>
+                                <pre><code class="language-yaml">apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cdm-transformer-service
+  labels:
+    app: cdm-transformer-service
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: cdm-transformer-service
+  template:
+    metadata:
+      labels:
+        app: cdm-transformer-service
+    spec:
+      containers:
+      - name: cdm-transformer-service
+        image: quay.io/myorg/cdm-transformer-service:1.0.0
+        ports:
+        - containerPort: 8080
+        env:
+        - name: QUARKUS_HTTP_PORT
+          value: "8080"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cdm-transformer-service
+spec:
+  selector:
+    app: cdm-transformer-service
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: cdm-transformer-service
+spec:
+  to:
+    kind: Service
+    name: cdm-transformer-service
+  port:
+    targetPort: 8080</code></pre>
+                            </div>
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span>quarkus-cdm-validator-deployment.yaml</span>
+                                    <button class="copy-btn" onclick="copyCode(this)">
+                                        <i class="fas fa-copy"></i> Copy
+                                    </button>
+                                </div>
+                                <pre><code class="language-yaml">apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cdm-validator-service
+  labels:
+    app: cdm-validator-service
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: cdm-validator-service
+  template:
+    metadata:
+      labels:
+        app: cdm-validator-service
+    spec:
+      containers:
+      - name: cdm-validator-service
+        image: quay.io/myorg/cdm-validator-service:1.0.0
+        ports:
+        - containerPort: 8080
+        env:
+        - name: QUARKUS_HTTP_PORT
+          value: "8080"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cdm-validator-service
+spec:
+  selector:
+    app: cdm-validator-service
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: cdm-validator-service
+spec:
+  to:
+    kind: Service
+    name: cdm-validator-service
+  port:
+    targetPort: 8080</code></pre>
+                            </div>
+                        </div>
+
+                        <div class="step-card">
+                            <h4>Test Data Preparation</h4>
+                            <p>Create sample payment status messages in pacs.002 format for testing.</p>
+                            <div class="architecture-card">
+                                <h4><i class="fas fa-check-circle"></i> Sample pacs.002 Payment Status Message</h4>
+                                <div class="code-block">
+                                    <div class="code-header">
+                                        <span>Sample pacs.002 Payment Status Message</span>
+                                        <button class="copy-btn" onclick="copyCode(this)">
+                                            <i class="fas fa-copy"></i> Copy
+                                        </button>
+                                    </div>
+                                    <pre><code class="language-xml">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;Document xmlns="urn:iso:std:iso:20022:tech:xsd:pacs.002.001.12"&gt;
+    &lt;FIToFIPmtStsRpt&gt;
+        &lt;GrpHdr&gt;
+            &lt;MsgId&gt;MSG20240828ABC123456&lt;/MsgId&gt;
+            &lt;CreDtTm&gt;2024-08-28T14:30:00Z&lt;/CreDtTm&gt;
+            &lt;InstgAgt&gt;
+                &lt;FinInstnId&gt;
+                    &lt;BICFI&gt;BNPAFRPPXXX&lt;/BICFI&gt;
+                &lt;/FinInstnId&gt;
+            &lt;/InstgAgt&gt;
+            &lt;InstdAgt&gt;
+                &lt;FinInstnId&gt;
+                    &lt;BICFI&gt;SOGEFRPPXXX&lt;/BICFI&gt;
+                &lt;/FinInstnId&gt;
+            &lt;/InstdAgt&gt;
+        &lt;/GrpHdr&gt;
+        &lt;OrgnlGrpInfAndSts&gt;
+            &lt;OrgnlMsgId&gt;PAYMENT20240828XYZ789012&lt;/OrgnlMsgId&gt;
+            &lt;OrgnlMsgNmId&gt;pacs.008.001.08&lt;/OrgnlMsgNmId&gt;
+            &lt;OrgnlCreDtTm&gt;2024-08-28T13:15:00Z&lt;/OrgnlCreDtTm&gt;
+            &lt;GrpSts&gt;ACSP&lt;/GrpSts&gt;
+        &lt;/OrgnlGrpInfAndSts&gt;
+        &lt;TxInfAndSts&gt;
+            &lt;OrgnlEndToEndId&gt;E2E-20240828-001&lt;/OrgnlEndToEndId&gt;
+            &lt;OrgnlTxId&gt;TX20240828001&lt;/OrgnlTxId&gt;
+            &lt;TxSts&gt;ACSC&lt;/TxSts&gt;
+            &lt;StsRsnInf&gt;
+                &lt;Rsn&gt;
+                    &lt;Cd&gt;G000&lt;/Cd&gt;
+                &lt;/Rsn&gt;
+                &lt;AddtlInf&gt;Payment successfully processed and settled&lt;/AddtlInf&gt;
+            &lt;/StsRsnInf&gt;
+            &lt;AccptncDtTm&gt;2024-08-28T14:28:15Z&lt;/AccptncDtTm&gt;
+            &lt;ClrSysRef&gt;CLR2024082812345&lt;/ClrSysRef&gt;
+            &lt;OrgnlTxRef&gt;
+                &lt;Amt&gt;
+                    &lt;InstdAmt Ccy="EUR"&gt;15000.00&lt;/InstdAmt&gt;
+                &lt;/Amt&gt;
+                &lt;ReqdExctnDt&gt;2024-08-28&lt;/ReqdExctnDt&gt;
+                &lt;Dbtr&gt;
+                    &lt;Nm&gt;Jean Dupont SARL&lt;/Nm&gt;
+                    &lt;PstlAdr&gt;
+                        &lt;Ctry&gt;FR&lt;/Ctry&gt;
+                        &lt;AdrLine&gt;25 Rue de Commerce&lt;/AdrLine&gt;
+                        &lt;AdrLine&gt;75001 PARIS&lt;/AdrLine&gt;
+                    &lt;/PstlAdr&gt;
+                &lt;/Dbtr&gt;
+                &lt;DbtrAcct&gt;
+                    &lt;Id&gt;
+                        &lt;IBAN&gt;FR7630001007941234567890185&lt;/IBAN&gt;
+                    &lt;/Id&gt;
+                &lt;/DbtrAcct&gt;
+                &lt;DbtrAgt&gt;
+                    &lt;FinInstnId&gt;
+                        &lt;BICFI&gt;BNPAFRPPXXX&lt;/BICFI&gt;
+                    &lt;/FinInstnId&gt;
+                &lt;/DbtrAgt&gt;
+                &lt;Cdtr&gt;
+                    &lt;Nm&gt;Marie Martin SAS&lt;/Nm&gt;
+                    &lt;PstlAdr&gt;
+                        &lt;Ctry&gt;FR&lt;/Ctry&gt;
+                        &lt;AdrLine&gt;14 Avenue des Champs&lt;/AdrLine&gt;
+                        &lt;AdrLine&gt;69002 LYON&lt;/AdrLine&gt;
+                    &lt;/PstlAdr&gt;
+                &lt;/Cdtr&gt;
+                &lt;CdtrAcct&gt;
+                    &lt;Id&gt;
+                        &lt;IBAN&gt;FR7630004000031234567890123&lt;/IBAN&gt;
+                    &lt;/Id&gt;
+                &lt;/CdtrAcct&gt;
+                &lt;CdtrAgt&gt;
+                    &lt;FinInstnId&gt;
+                        &lt;BICFI&gt;SOGEFRPPXXX&lt;/BICFI&gt;
+                    &lt;/FinInstnId&gt;
+                &lt;/CdtrAgt&gt;
+                &lt;RmtInf&gt;
+                    &lt;Ustrd&gt;Facture F-2024-001 - Règlement marchandises&lt;/Ustrd&gt;
+                &lt;/RmtInf&gt;
+            &lt;/OrgnlTxRef&gt;
+        &lt;/TxInfAndSts&gt;
+    &lt;/FIToFIPmtStsRpt&gt;
+&lt;/Document&gt;</code></pre>
+                                </div>
+                            </div>
+
+                            <div class="architecture-card">
+                                <h4><i class="fas fa-file-code"></i> Expected CDM Output</h4>
+                                <p>Expected CDM output after transformation:</p>
+                                <div class="code-block">
+                                    <div class="code-header">
+                                        <span>Expected CDM JSON</span>
+                                        <button class="copy-btn" onclick="copyCode(this)">
+                                            <i class="fas fa-copy"></i> Copy
+                                        </button>
+                                    </div>
+                                    <pre><code class="language-json">{
+  "cdmVersion": "2.0",
+  "messageFamily": "PACS",
+  "messageType": "STATUS",
+  "messageId": "MSG20240828ABC123456",
+  "creationDateTime": "2024-08-28T14:30:00Z",
+
+  "businessContext": {
+    "businessService": "sepa.credit.transfer",
+    "contextType": "FINANCIAL_INSTITUTION",
+    "batchProcessing": false
+  },
+
+  "parties": {
+    "initiatingParty": {
+      "type": "BANK",
+      "bic": "BNPAFRPPXXX"
+    },
+
+    "debtor": {
+      "type": "CORPORATE",
+      "name": "Jean Dupont SARL",
+      "account": {
+        "iban": "FR7630001007941234567890185",
+        "currency": "EUR"
+      },
+      "agent": {
+        "bic": "BNPAFRPPXXX"
+      },
+      "address": {
+        "country": "FR",
+        "addressLines": ["25 Rue de Commerce", "75001 PARIS"]
+      }
+    },
+
+    "creditor": {
+      "type": "CORPORATE",
+      "name": "Marie Martin SAS",
+      "account": {
+        "iban": "FR7630004000031234567890123",
+        "currency": "EUR"
+      },
+      "agent": {
+        "bic": "SOGEFRPPXXX"
+      },
+      "address": {
+        "country": "FR",
+        "addressLines": ["14 Avenue des Champs", "69002 LYON"]
+      }
+    }
+  },
+
+  "paymentInformation": {
+    "paymentId": "E2E-20240828-001",
+    "originalMessageId": "PAYMENT20240828XYZ789012",
+    "originalMessageType": "pacs.008.001.08",
+    "endToEndId": "E2E-20240828-001",
+    "transactionId": "TX20240828001",
+
+    "amounts": {
+      "instructedAmount": 15000.00,
+      "currency": "EUR"
+    },
+
+    "dates": {
+      "requestedExecutionDate": "2024-08-28",
+      "acceptanceDateTime": "2024-08-28T14:28:15Z"
+    },
+
+    "paymentType": {
+      "serviceLevel": "SEPA",
+      "localInstrument": "CORE"
+    },
+
+    "chargeBearer": "SHAR",
+    "clearingChannel": "RTGS"
+  },
+
+  "statusInformation": {
+    "transactionStatus": "ACSC",
+    "groupStatus": "ACSP",
+    "statusReason": {
+      "code": "G000",
+      "additionalInformation": "Payment successfully processed and settled"
+    }
+  },
+
+  "additionalData": {
+    "remittanceInformation": {
+      "unstructured": "Facture F-2024-001 - Règlement marchandises"
+    }
+  },
+
+  "metadata": {
+    "version": "pacs.002.001.12",
+    "originator": "BNPAFRPPXXX",
+    "fileFormat": "XML",
+    "validationStatus": "VALID"
+  }
+}</code></pre>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="step-card">
+                            <h4>Running the Test</h4>
+                            <p>Execute the test script to send sample payments and verify the results:</p>
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span>test-poc.sh</span>
+                                    <button class="copy-btn" onclick="copyCode(this)">
+                                        <i class="fas fa-copy"></i> Copy
+                                    </button>
+                                </div>
+                                <pre><code class="language-bash">#!/bin/bash
+# test-poc.sh
+echo "Starting POC test..."
+echo "1. Sending test payment to MQ Series"
+java -jar mq-test-client.jar send PAYMENT.INBOUND sample-pacs002.xml
+echo "2. Waiting for processing..."
+sleep 10
+echo "3. Checking Kafka topics"
+kafka-console-consumer --bootstrap-server localhost:9092 --topic mq-payment-input --from-beginning --max-messages 1
+kafka-console-consumer --bootstrap-server localhost:9092 --topic cdm-validated --from-beginning --max-messages 1
+kafka-console-consumer --bootstrap-server localhost:9092 --topic validated-payments --from-beginning --max-messages 1
+echo "4. Checking core banking simulation logs"
+kubectl logs deployment/core-banking-simulator -n poc
+echo "5. Checking database for audit logs"
+psql -h localhost -U postgres -d auditdb -c "SELECT * FROM payment_audit ORDER BY timestamp DESC LIMIT 5;"
+echo "POC test completed!"</code></pre>
+                            </div>
+                        </div>
+
+                        <div class="step-card">
+                            <h4>Monitoring and Verification</h4>
+                            <p>Use the monitoring dashboard to verify the POC is working correctly:</p>
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span>Monitoring Commands</span>
+                                    <button class="copy-btn" onclick="copyCode(this)">
+                                        <i class="fas fa-copy"></i> Copy
+                                    </button>
+                                </div>
+                                <pre><code class="language-bash"># Access monitoring tools
+# Grafana dashboard
+open http://localhost:3000/d/poc-dashboard
+# Kafka UI
+open http://localhost:8080
+# Jaeger tracing
+open http://localhost:16686
+# Check system health
+kubectl get pods -n poc
+kubectl get integrations -n poc
+kubectl get kafkas -n kafka
+kubectl get deployments -n poc
+# Check Kaoto integrations
+kubectl get integrations -n camel-k -o yaml | grep "kaoto/designer"</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="component-details">
+                    <h3 class="collapsible active">
+                        <i class="fas fa-clipboard-check"></i> POC Success Criteria
+                        <i class="fas fa-chevron-right collapsible-icon"></i>
+                    </h3>
+
+                    <div class="collapsible-content active">
+                        <p>The POC will be considered successful when all the following criteria are met:</p>
+                        <div class="architecture-grid">
+                            <div class="architecture-card">
+                                <h4><i class="fas fa-exchange-alt"></i> End-to-End Processing</h4>
+                                <p>Payment messages are successfully processed from MQ Series to core banking system with all transformations and validations.</p>
+                                <div class="tech-pill pill-poc">Success Criteria</div>
+                            </div>
+                            <div class="architecture-card">
+                                <h4><i class="fas fa-bug"></i> Error Handling</h4>
+                                <p>Invalid payments are properly routed to the dead letter queue with appropriate error messages.</p>
+                                <div class="tech-pill pill-poc">Success Criteria</div>
+                            </div>
+                            <div class="architecture-card">
+                                <h4><i class="fas fa-tachometer-alt"></i> Performance</h4>
+                                <p>The system processes at least 100 payments per second with latency under 500ms for 95% of requests.</p>
+                                <div class="tech-pill pill-poc">Success Criteria</div>
+                            </div>
+                            <div class="architecture-card">
+                                <h4><i class="fas fa-database"></i> Data Consistency</h4>
+                                <p>All payments are accurately transformed to CDM format and all data is preserved through the processing chain.</p>
+                                <div class="tech-pill pill-poc">Success Criteria</div>
+                            </div>
+                            <div class="architecture-card">
+                                <h4><i class="fas fa-history"></i> Audit Trail</h4>
+                                <p>Complete audit trail is maintained in PostgreSQL with all processing steps logged.</p>
+                                <div class="tech-pill pill-poc">Success Criteria</div>
+                            </div>
+                            <div class="architecture-card">
+                                <h4><i class="fas fa-chart-line"></i> Monitoring</h4>
+                                <p>All processing steps are visible in monitoring dashboards with appropriate metrics and alerts.</p>
+                                <div class="tech-pill pill-poc">Success Criteria</div>
+                            </div>
+                            <div class="architecture-card">
+                                <h4><i class="fas fa-pencil-ruler"></i> Kaoto Integration</h4>
+                                <p>All integrations are successfully designed and deployed using Kaoto's visual interface.</p>
+                                <div class="tech-pill pill-kaoto">Success Criteria</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="component-details">
+                    <h3 class="collapsible active">
+                        <i class="fas fa-file-alt"></i> POC Conclusion and Next Steps
+                        <i class="fas fa-chevron-right collapsible-icon"></i>
+                    </h3>
+
+                    <div class="collapsible-content active">
+                        <p>Upon successful completion of the POC, the following next steps are recommended:</p>
+                        <div class="step-container">
+                            <div class="step-card">
+                                <h4>Production Deployment Planning</h4>
+                                <p>Based on POC results, create a detailed plan for production deployment including capacity planning, high availability setup, and disaster recovery.</p>
+                            </div>
+                            <div class="step-card">
+                                <h4>Additional Payment Types</h4>
+                                <p>Extend the implementation to support additional payment types and formats beyond the initial MQ Series implementation.</p>
+                            </div>
+                            <div class="step-card">
+                                <h4>Enhanced Monitoring</h4>
+                                <p>Implement advanced monitoring features including predictive analytics, anomaly detection, and automated alerting.</p>
+                            </div>
+                            <div class="step-card">
+                                <h4>Security Hardening</h4>
+                                <p>Apply additional security measures including encryption at rest, enhanced authentication, and compliance controls.</p>
+                            </div>
+                            <div class="step-card">
+                                <h4>Operational Procedures</h4>
+                                <p>Develop comprehensive operational procedures for monitoring, maintenance, and incident response.</p>
+                            </div>
+                            <div class="step-card">
+                                <h4>Expand Kaoto Usage</h4>
+                                <p>Extend the use of Kaoto for designing and managing additional integrations across the enterprise.</p>
+                            </div>
+                        </div>
+                        <div class="poc-highlight">
+                            <h4><i class="fas fa-lightbulb"></i> POC Insights</h4>
+                            <p>The POC has demonstrated that the proposed architecture using Kaoto for visual integration development, Quarkus for microservices, and Camel K for routing is capable of handling the payment processing requirements with excellent performance, reliability, and maintainability. The Common Data Model approach successfully abstracts away format differences and provides a consistent processing pipeline.</p>
+                            <p>Kaoto has proven to be an effective tool for visually designing and deploying integrations, significantly reducing development time and improving collaboration between developers and business analysts.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer>
+            <div class="container">
+                <p>Cloud-Native Integration Framework - Architecture Visualization</p>
+                <p>© 2025 - Banking Integration with Kaoto, Quarkus, and Camel K</p>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Initialize Mermaid with configuration
+        mermaid.initialize({
+            startOnLoad: false,
+            theme: 'default',
+            securityLevel: 'loose',
+            fontFamily: 'Segoe UI, Tahoma, Geneva, Verdana, sans-serif',
+            flowchart: { useMaxWidth: true, htmlLabels: true, curve: 'basis' },
+            gantt: {
+                barHeight: 30,
+                fontSize: 14,
+                useMaxWidth: true
+            },
+            sequence: { useMaxWidth: true }
+        });
+
+        // Initialize syntax highlighting
+        hljs.highlightAll();
+
+        // Tab switching logic
+        document.querySelectorAll('.tab-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const tabId = this.getAttribute('data-tab');
+                document.querySelectorAll('.tab-content').forEach(tab => {
+                    tab.classList.remove('active');
+                });
+                document.getElementById(tabId).classList.add('active');
+
+                // Refresh all diagrams in the active tab
+                setTimeout(() => {
+                    renderMermaidDiagrams(`#${tabId}`);
+                }, 50);
+            });
+        });
+
+        // Zoom functions
+        function zoomIn(diagramId) {
+            const diagram = document.getElementById(diagramId);
+            const currentScale = diagram.style.transform ? parseFloat(diagram.style.transform.match(/scale\(([^)]+)\)/)[1]) : 1;
+            diagram.style.transform = `scale(${currentScale + 0.2})`;
+            diagram.parentElement.style.overflow = 'auto';
+        }
+
+        function resetZoom(diagramId) {
+            const diagram = document.getElementById(diagramId);
+            diagram.style.transform = 'scale(1)';
+        }
+
+        // Copy code function
+        function copyCode(button) {
+            const codeBlock = button.closest('.code-block').querySelector('code');
+            navigator.clipboard.writeText(codeBlock.textContent).then(() => {
+                const originalText = button.innerHTML;
+                button.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                setTimeout(() => {
+                    button.innerHTML = originalText;
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+            });
+        }
+
+        // Initialize collapsible sections
+        document.addEventListener('DOMContentLoaded', function() {
+            // Ouvrir toutes les sections collapsibles par défaut
+            document.querySelectorAll('.collapsible').forEach(collapsible => {
+                collapsible.classList.add('active');
+                const content = collapsible.nextElementSibling;
+                if (content) {
+                    content.classList.add('active');
+                    content.style.maxHeight = content.scrollHeight + 'px';
+                }
+            });
+
+            // Gérer le clic sur les sections collapsibles
+            document.querySelectorAll('.collapsible').forEach(collapsible => {
+                collapsible.addEventListener('click', function() {
+                    this.classList.toggle('active');
+                    const content = this.nextElementSibling;
+                    if (content) {
+                        if (content.classList.contains('active')) {
+                            content.style.maxHeight = null;
+                            content.classList.remove('active');
+                        } else {
+                            content.style.maxHeight = content.scrollHeight + 'px';
+                            content.classList.add('active');
+                        }
+                    }
+                });
+            });
+
+            // Render Mermaid diagrams in a specific container
+            function renderMermaidDiagrams(containerSelector = '.tab-content.active') {
+                const diagrams = document.querySelectorAll(`${containerSelector} .mermaid`);
+                diagrams.forEach(diagram => {
+                    if (diagram.innerHTML.includes('diagram-loading')) {
+                        const code = diagram.querySelector('code') ? diagram.querySelector('code').textContent : diagram.textContent;
+                        diagram.innerHTML = code;
+                    }
+                    mermaid.init(undefined, diagram);
+                });
+            }
+
+            // Initial rendering
+            renderMermaidDiagrams();
+        });
+    </script>
+</body>
+</html>
