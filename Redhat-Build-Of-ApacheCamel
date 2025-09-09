@@ -1,0 +1,1312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Critical Platform Architecture with Red Hat Build of Apache Camel</title>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Mermaid.js for diagrams -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+    <!-- svg-pan-zoom for interactive zoom/pan -->
+    <script src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.6.2/dist/svg-pan-zoom.min.js"></script>
+    <!-- Google Fonts for a modern font -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #3498db;
+            --primary-dark: #2980b9;
+            --secondary: #2c3e50;
+            --accent: #ff9800;
+            --light: #f9f9f9;
+            --dark: #333;
+            --success: #27ae60;
+            --danger: #e74c3c;
+            --warning: #f39c12;
+            --info: #3498db;
+            --gray: #95a5a6;
+            --light-gray: #ecf0f1;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+        /* Base styles and modern font */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Roboto', 'Segoe UI', sans-serif;
+            line-height: 1.6;
+            color: var(--dark);
+            background-color: var(--light-gray);
+            padding: 0;
+            margin: 0;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            overflow: hidden;
+            width: 100%;
+        }
+        /* Header Styles */
+        header {
+            background: linear-gradient(135deg, var(--secondary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .logo h1 {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            font-size: 1.8rem;
+            margin: 0;
+            border: none;
+            padding: 0;
+        }
+        .logo-icon {
+            font-size: 2rem;
+            color: var(--accent);
+        }
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 1.5rem;
+            margin: 0;
+        }
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+        }
+        nav a:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        /* Main content */
+        main {
+            padding: 2rem;
+            width: 100%;
+        }
+        /* Tab navigation */
+        .tab-navigation {
+            display: flex;
+            border-bottom: 2px solid var(--light-gray);
+            margin-bottom: 2rem;
+            background: white;
+            border-radius: var(--border-radius) var(--border-radius) 0 0;
+            overflow: hidden;
+        }
+        .tab-button {
+            padding: 1rem 2rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--dark);
+            transition: var(--transition);
+            position: relative;
+            flex: 1;
+            text-align: center;
+        }
+        .tab-button.active {
+            color: var(--primary);
+            background-color: rgba(52, 152, 219, 0.1);
+        }
+        .tab-button:hover {
+            color: var(--primary);
+            background-color: rgba(52, 152, 219, 0.05);
+        }
+        .tab-button.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: var(--primary);
+        }
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        /* Headers */
+        h1, h2, h3, h4 {
+            color: var(--secondary);
+            font-family: 'Montserrat', sans-serif;
+        }
+        h1 {
+            text-align: center;
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 1rem;
+            margin-bottom: 2rem;
+        }
+        h2 {
+            border-bottom: 1px solid var(--light-gray);
+            padding-bottom: 0.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        h2 i {
+            color: var(--primary);
+        }
+        /* Architecture diagram */
+        .architecture-diagram {
+            background: white;
+            border: 1px solid var(--light-gray);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            margin: 2rem 0;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            cursor: grab;
+            min-height: 600px; /* Hauteur minimale pour le conteneur */
+            width: 100%; /* Largeur à 100% */
+        }
+        .architecture-diagram:active {
+            cursor: grabbing;
+        }
+        .diagram-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        .diagram-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .btn {
+            padding: 0.6rem 1rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: 'Roboto', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .btn-outline {
+            background-color: transparent;
+            color: var(--primary);
+            border: 1px solid var(--primary);
+        }
+        .btn-outline:hover, .btn-outline.active {
+            background-color: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .btn:hover {
+            opacity: 0.9;
+        }
+        /* Legend */
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.3rem 0.8rem;
+            background: var(--light-gray);
+            border-radius: 20px;
+        }
+        .legend-color {
+            width: 15px;
+            height: 15px;
+            border-radius: 3px;
+        }
+        /* Mermaid diagram container */
+        .mermaid {
+            font-family: 'Roboto', 'Segoe UI', sans-serif;
+            max-width: 100%;
+            margin: 0 auto;
+            overflow: visible;
+            min-height: 500px; /* Hauteur minimale pour le diagramme */
+        }
+        .mermaid .node rect {
+            rx: 5px;
+            ry: 5px;
+        }
+        .mermaid .label {
+            font-family: 'Roboto', sans-serif !important;
+            font-size: 12px;
+            fill: #333;
+        }
+        .mermaid .edgeLabel {
+            font-family: 'Roboto', sans-serif !important;
+            font-size: 11px;
+            fill: #555;
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+        /* Architecture cards grid */
+        .architecture-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        .architecture-card {
+            background: white;
+            border: 1px solid var(--light-gray);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            transition: var(--transition);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        .architecture-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--box-shadow);
+        }
+        .architecture-card h4 {
+            margin-top: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--secondary);
+            border-bottom: 1px solid var(--light-gray);
+            padding-bottom: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        .architecture-card p {
+            margin-bottom: 1rem;
+            flex-grow: 1;
+        }
+        /* Tech pills (colored labels) */
+        .tech-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        .tech-pill {
+            display: inline-block;
+            padding: 0.4rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: white;
+        }
+        .pill-camel { background-color: #FF9800; }
+        .pill-openshift { background-color: #EE0000; }
+        .pill-amq { background-color: #4CAF50; }
+        .pill-postgres { background-color: #9C27B0; }
+        .pill-external { background-color: #F44336; }
+        .pill-monitoring { background-color: #795548; }
+        .pill-cicd { background-color: #009688; }
+        .pill-dynatrace { background-color: #772953; }
+        .pill-quarkus { background-color: #6DB33F; }
+        .pill-tools { background-color: #607D8B; }
+        /* Comparison table styles */
+        .comparison-table-container {
+            overflow-x: auto;
+            margin-bottom: 2rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+        }
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95rem;
+        }
+        .comparison-table th, .comparison-table td {
+            border: 1px solid var(--light-gray);
+            padding: 1rem;
+            text-align: left;
+        }
+        .comparison-table th {
+            background-color: var(--primary);
+            color: white;
+            font-weight: 600;
+        }
+        .comparison-table tr:nth-child(even) {
+            background-color: var(--light);
+        }
+        .comparison-table tr:hover {
+            background-color: rgba(52, 152, 219, 0.05);
+        }
+        .pro {
+            color: var(--success);
+            font-weight: bold;
+        }
+        .con {
+            color: var(--danger);
+            font-weight: bold;
+        }
+        /* Recommendation grid */
+        .recommendation-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .recommendation-item {
+            background: white;
+            border: 1px solid var(--light-gray);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            transition: var(--transition);
+        }
+        .recommendation-item:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--box-shadow);
+        }
+        .recommendation-item h4 {
+            margin-top: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .hybrid-approach {
+            background: white;
+            border: 1px solid var(--light-gray);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+        .hybrid-approach h4 {
+            margin-top: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        /* Intro text */
+        .intro-text {
+            background: var(--light);
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            margin-bottom: 2rem;
+            border-left: 4px solid var(--primary);
+        }
+        /* Key differences */
+        .key-differences {
+            background: var(--light);
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            margin-bottom: 2rem;
+        }
+        /* Hidden class for toggling layers */
+        .hidden {
+            opacity: 0.2;
+            transition: opacity 0.3s ease;
+        }
+        /* Footer */
+        footer {
+            background: var(--secondary);
+            color: white;
+            text-align: center;
+            padding: 1.5rem;
+            margin-top: 3rem;
+        }
+        /* Responsive design */
+        @media (max-width: 992px) {
+            header {
+                flex-direction: column;
+                text-align: center;
+                gap: 1rem;
+            }
+            nav ul {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            .tab-navigation {
+                flex-direction: column;
+            }
+            .recommendation-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        @media (max-width: 768px) {
+            .architecture-grid {
+                grid-template-columns: 1fr;
+            }
+            .diagram-actions {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .btn {
+                justify-content: center;
+            }
+            .legend {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+        /* Print styles */
+        @media print {
+            .tab-navigation, .diagram-actions, .btn {
+                display: none;
+            }
+            .tab-content {
+                display: block !important;
+            }
+            body, .container {
+                background: white;
+                box-shadow: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <div class="logo">
+                <i class="fas fa-project-diagram logo-icon"></i>
+                <h1>Critical Platform Architecture</h1>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="#global">Architecture</a></li>
+                    <li><a href="#camel-comparison">Camel Comparison</a></li>
+                    <li><a href="#resources">Resources</a></li>
+                </ul>
+            </nav>
+        </header>
+        <main>
+            <!-- Tab Navigation -->
+            <div class="tab-navigation">
+                <button class="tab-button active" data-tab="global">Global Architecture</button>
+                <button class="tab-button" data-tab="camel-comparison">Apache Camel Comparison</button>
+            </div>
+            <!-- Global Architecture Section -->
+            <section id="global" class="tab-content active">
+                <h2><i class="fas fa-globe"></i> Global Architecture for Critical Application</h2>
+                <!-- Diagram Interaction Buttons -->
+                <div class="diagram-actions">
+                    <button id="zoomInBtn" class="btn btn-primary" title="Zoom In"><i class="fas fa-search-plus"></i> Zoom In</button>
+                    <button id="zoomOutBtn" class="btn btn-outline" title="Reset Zoom"><i class="fas fa-search-minus"></i> Reset Zoom</button>
+                    <button id="toggleMonitoringBtn" class="btn btn-outline" title="Toggle Monitoring Layer"><i class="fas fa-eye"></i> Monitoring</button>
+                    <button id="toggleExternalBtn" class="btn btn-outline" title="Toggle External Systems Layer"><i class="fas fa-external-link-alt"></i> External</button>
+                    <button id="toggleCICDBtn" class="btn btn-outline" title="Toggle CI/CD Layer"><i class="fas fa-code-branch"></i> CI/CD</button>
+                    <button id="highlightCamelBtn" class="btn btn-outline" title="Highlight Apache Camel"><i class="fas fa-highlighter"></i> Apache Camel</button>
+                </div>
+                <!-- Legend -->
+                <div class="legend">
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #6DB33F;"></div>
+                        <span>Quarkus/Spring Boot Services</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #FF9800;"></div>
+                        <span>Red Hat Build of Apache Camel</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #4CAF50;"></div>
+                        <span>Red Hat AMQ/Kafka</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #9C27B0;"></div>
+                        <span>PostgreSQL</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #EE0000;"></div>
+                        <span>OpenShift</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #F44336;"></div>
+                        <span>External Systems</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #772953;"></div>
+                        <span>Dynatrace</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #795548;"></div>
+                        <span>Prometheus/Grafana</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #009688;"></div>
+                        <span>CI/CD</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #607D8B;"></div>
+                        <span>Camel Tools</span>
+                    </div>
+                </div>
+                <!-- Mermaid Diagram -->
+                <div class="architecture-diagram">
+                    <div class="mermaid" id="globalDiagram">
+                        graph TB
+                            %% Node styles
+                            classDef frontend fill:#4285F4,stroke:#1565C0,color:#FFFFFF,stroke-width:2px;
+                            classDef backend fill:#34A853,stroke:#2D8E47,color:#FFFFFF,stroke-width:2px;
+                            classDef integration fill:#FF9800,stroke:#E65100,color:#FFFFFF,stroke-width:2px;
+                            classDef data fill:#9C27B0,stroke:#7B1FA2,color:#FFFFFF,stroke-width:2px;
+                            classDef monitoring fill:#795548,stroke:#3E2723,color:#FFFFFF,stroke-width:2px;
+                            classDef external fill:#F44336,stroke:#C62828,color:#FFFFFF,stroke-width:2px;
+                            classDef cicd fill:#009688,stroke:#00695C,color:#FFFFFF,stroke-width:2px;
+                            classDef tools fill:#607D8B,stroke:#37474F,color:#FFFFFF,stroke-width:2px;
+                            classDef hidden opacity:0.2;
+                            %% CI/CD Pipeline
+                            subgraph CICD["CI/CD Pipeline"]
+                                GIT["Git Repository"]:::cicd
+                                JENK["Jenkins"]:::cicd
+                                ARGO["ArgoCD"]:::cicd
+                                CAMEL_K_OP["Camel K Operator"]:::cicd
+                                TEMPLATING["Templating"]:::cicd
+                                PLATFORM_AS_CODE["Platform as Code"]:::cicd
+                            end
+                            %% Frontend Layer
+                            subgraph Frontend["Frontend"]
+                                WEB["Web Portal"]:::frontend
+                                MOB["Mobile App"]:::frontend
+                                EXT["Third-Party API"]:::frontend
+                            end
+                            %% API Gateway
+                            GW["API Gateway"]:::integration
+                            %% Backend Services
+                            subgraph Backend["Backend Services"]
+                                ACC["Account Service"]:::backend
+                                PAY["Payment Service"]:::backend
+                                TRF["Transaction Service"]:::backend
+                            end
+                            %% Integration Platform
+                            subgraph Integration["Integration Platform"]
+                                subgraph Messaging["Messaging"]
+                                    IN_TOPIC["Request Topic"]:::integration
+                                    PROCESS_TOPIC["Processing Topic"]:::integration
+                                    OUT_TOPIC["Response Topic"]:::integration
+                                    DLQ["Dead Letter Queue"]:::integration
+                                end
+                                subgraph Camel["Red Hat Build of Apache Camel"]
+                                    CAMEL_IN["Request Routes"]:::integration
+                                    CAMEL_PROC["Processing Routes"]:::integration
+                                    CAMEL_OUT["Response Routes"]:::integration
+                                    CAMEL_HEALTH["Health Checks"]:::integration
+                                    KAMELETS["Kamelets"]:::integration
+                                end
+                            end
+                            %% Data Storage
+                            subgraph Data["Data Storage"]
+                                PG_ACC["Accounts DB"]:::data
+                                PG_TXN["Transactions DB"]:::data
+                                PG_LOG["Audit Logs"]:::data
+                            end
+                            %% External Systems
+                            subgraph External["External Systems"]
+                                ERP["ERP System"]:::external
+                                SWIFT["SWIFT Network"]:::external
+                            end
+                            %% Monitoring
+                            subgraph Monitoring["Monitoring"]
+                                DYNA["Dynatrace"]:::monitoring
+                                PROM["Prometheus"]:::monitoring
+                                GRAF["Grafana"]:::monitoring
+                                HAWTIO["HawtIO Diagnostic Console"]:::monitoring
+                            end
+                            %% Camel Tools
+                            subgraph CamelTools["Camel Tools"]
+                                KAOTO["Kaoto Visual Designer"]:::tools
+                                CAMEL_CLI["Camel CLI"]:::tools
+                                CAMEL_SPRING["Camel for Spring Boot"]:::tools
+                            end
+                            %% CI/CD Connections
+                            GIT -->|Triggers| JENK
+                            JENK -->|Builds & Tests| ARGO
+                            ARGO -->|Deploys| CAMEL_K_OP
+                            CAMEL_K_OP -->|Manages| Camel
+                            TEMPLATING -->|Configures| PLATFORM_AS_CODE
+                            PLATFORM_AS_CODE -->|Defines| Backend
+                            %% Application Connections
+                            WEB -->|Request| GW
+                            MOB -->|Request| GW
+                            EXT -->|Request| GW
+                            GW -->|Forward| IN_TOPIC
+                            IN_TOPIC -->|Route| CAMEL_IN
+                            CAMEL_IN -->|Process| PROCESS_TOPIC
+                            PROCESS_TOPIC -->|Call| CAMEL_PROC
+                            CAMEL_PROC -->|Request| ACC
+                            CAMEL_PROC -->|Request| PAY
+                            CAMEL_PROC -->|Request| TRF
+                            CAMEL_PROC -.->|Error| DLQ
+                            ACC -->|Response| OUT_TOPIC
+                            PAY -->|Response| OUT_TOPIC
+                            TRF -->|Response| OUT_TOPIC
+                            OUT_TOPIC -->|Send| CAMEL_OUT
+                            CAMEL_OUT -->|Forward| ERP
+                            CAMEL_OUT -->|Forward| SWIFT
+                            %% Secondary connections (logs, monitoring)
+                            CAMEL_IN -.->|Log| PG_LOG
+                            CAMEL_PROC -.->|Log| PG_LOG
+                            CAMEL_OUT -.->|Log| PG_LOG
+                            ACC -.->|Store| PG_ACC
+                            PAY -.->|Store| PG_TXN
+                            TRF -.->|Store| PG_TXN
+                            %% Monitoring connections
+                            DYNA -.->|Monitor| ACC
+                            DYNA -.->|Monitor| PAY
+                            DYNA -.->|Monitor| TRF
+                            DYNA -.->|Monitor| CAMEL_IN
+                            DYNA -.->|Monitor| CAMEL_PROC
+                            DYNA -.->|Monitor| CAMEL_OUT
+                            PROM -.->|Collect| ACC
+                            PROM -.->|Collect| PAY
+                            PROM -.->|Collect| TRF
+                            PROM -.->|Collect| CAMEL_IN
+                            PROM -.->|Collect| CAMEL_PROC
+                            PROM -.->|Collect| CAMEL_OUT
+                            GRAF -.->|Visualize| PROM
+                            GRAF -.->|Visualize| DYNA
+                            HAWTIO -.->|Diagnose| Camel
+                            %% Tools connections
+                            KAOTO -.->|Design| Camel
+                            CAMEL_CLI -.->|Manage| Camel
+                            CAMEL_SPRING -.->|Integrate| Backend
+                    </div>
+                </div>
+                <!-- Architecture Cards -->
+                <div class="architecture-grid">
+                    <!-- Quarkus/Spring Boot Card -->
+                    <div class="architecture-card">
+                        <h4><i class="fas fa-bolt"></i> Quarkus/Spring Boot: Business Logic Layer</h4>
+                        <p>
+                            <strong>Why Quarkus/Spring Boot?</strong>
+                            Quarkus and Spring Boot are modern Java frameworks for building cloud-native, scalable applications.
+                        </p>
+                        <p>
+                            <strong>Key Features:</strong>
+                            <ul style="margin-top: 10px; padding-left: 20px; font-size: 0.9rem;">
+                                <li><strong>Cloud-Native:</strong> Optimized for containers and Kubernetes.</li>
+                                <li><strong>Developer Productivity:</strong> Fast startup, live reload, and embedded servers.</li>
+                                <li><strong>Enterprise Support:</strong> Security, data access, and microservices patterns.</li>
+                                <li><strong>Observability:</strong> Built-in metrics, health checks, and tracing.</li>
+                            </ul>
+                        </p>
+                        <p>
+                            <strong>Use Cases:</strong>
+                            <ul style="margin-top: 10px; padding-left: 20px; font-size: 0.9rem;">
+                                <li>Account Service: Manages customer accounts and balances.</li>
+                                <li>Payment Service: Handles payment processing and validation.</li>
+                                <li>Transaction Service: Manages transaction history and reporting.</li>
+                            </ul>
+                        </p>
+                        <div class="tech-pills">
+                            <div class="tech-pill pill-quarkus">Quarkus/Spring Boot</div>
+                            <div class="tech-pill pill-openshift">OpenShift</div>
+                        </div>
+                    </div>
+                    <!-- OpenShift Card -->
+                    <div class="architecture-card">
+                        <h4><i class="fas fa-cubes"></i> OpenShift: Container Platform</h4>
+                        <p>
+                            <strong>Why OpenShift?</strong>
+                            OpenShift is a Kubernetes-based platform optimized for enterprise applications, with built-in security, CI/CD, and monitoring.
+                        </p>
+                        <p>
+                            <strong>Key Features:</strong>
+                            <ul style="margin-top: 10px; padding-left: 20px; font-size: 0.9rem;">
+                                <li><strong>Enterprise Kubernetes:</strong> Secure, scalable, and compliant container orchestration.</li>
+                                <li><strong>Built-in CI/CD:</strong> Integrated Jenkins, GitOps, and ArgoCD support.</li>
+                                <li><strong>Developer Tools:</strong> Web console, CLI, and IDE integrations.</li>
+                                <li><strong>Security:</strong> Role-based access control (RBAC), network policies, and image scanning.</li>
+                                <li><strong>Monitoring:</strong> Integrated Prometheus, Grafana, and logging.</li>
+                            </ul>
+                        </p>
+                        <p>
+                            <strong>Use Cases:</strong>
+                            <ul style="margin-top: 10px; padding-left: 20px; font-size: 0.9rem;">
+                                <li>Secure deployment of Quarkus/Spring Boot and Red Hat Build of Apache Camel services.</li>
+                                <li>Automated scaling and self-healing for high availability.</li>
+                                <li>Compliance with enterprise regulations.</li>
+                            </ul>
+                        </p>
+                        <div class="tech-pills">
+                            <div class="tech-pill pill-openshift">OpenShift</div>
+                        </div>
+                    </div>
+                    <!-- Red Hat AMQ/Kafka Card -->
+                    <div class="architecture-card">
+                        <h4><i class="fas fa-exchange-alt"></i> Red Hat AMQ/Kafka: Messaging Layer</h4>
+                        <p>
+                            <strong>Why Red Hat AMQ/Kafka?</strong>
+                            Red Hat AMQ and Kafka provide reliable, scalable messaging for event-driven architectures.
+                        </p>
+                        <p>
+                            <strong>Key Features:</strong>
+                            <ul style="margin-top: 10px; padding-left: 20px; font-size: 0.9rem;">
+                                <li><strong>Red Hat AMQ:</strong> Lightweight, JMS-compliant messaging with queues and topics.</li>
+                                <li><strong>Kafka:</strong> High-throughput, distributed event streaming.</li>
+                                <li><strong>Integration:</strong> Works seamlessly with Red Hat Build of Apache Camel.</li>
+                                <li><strong>Resilience:</strong> Persistent storage and clustering for high availability.</li>
+                            </ul>
+                        </p>
+                        <p>
+                            <strong>Use Cases:</strong>
+                            <ul style="margin-top: 10px; padding-left: 20px; font-size: 0.9rem;">
+                                <li>Payment Requests: Asynchronous processing of payment events.</li>
+                                <li>Transaction Logs: Real-time streaming of transaction data.</li>
+                                <li>Audit Trails: Reliable storage of audit logs.</li>
+                            </ul>
+                        </p>
+                        <div class="tech-pills">
+                            <div class="tech-pill pill-amq">Red Hat AMQ</div>
+                            <div class="tech-pill pill-amq">Kafka</div>
+                        </div>
+                    </div>
+                    <!-- Red Hat Build of Apache Camel Card -->
+                    <div class="architecture-card">
+                        <h4><i class="fas fa-exchange-alt"></i> Red Hat Build of Apache Camel: Integration Layer</h4>
+                        <p>
+                            <strong>Why Red Hat Build of Apache Camel?</strong>
+                            Red Hat Build of Apache Camel is an enterprise-grade integration framework optimized for OpenShift and cloud-native environments.
+                        </p>
+                        <p>
+                            <strong>Key Features:</strong>
+                            <ul style="margin-top: 10px; padding-left: 20px; font-size: 0.9rem;">
+                                <li><strong>Enterprise Support:</strong> Official Red Hat support and SLAs.</li>
+                                <li><strong>OpenShift-Native:</strong> Deploys as custom resources using Camel K Operator.</li>
+                                <li><strong>300+ Connectors:</strong> Supports REST, SOAP, databases, Kafka, AMQ, and more.</li>
+                                <li><strong>Observability:</strong> Integrated with Prometheus, OpenTelemetry, and Dynatrace.</li>
+                                <li><strong>Dead Letter Pattern:</strong> Handles failed messages gracefully.</li>
+                                <li><strong>Kamelets:</strong> Reusable integration components.</li>
+                                <li><strong>Health Checks:</strong> Built-in monitoring endpoints.</li>
+                            </ul>
+                        </p>
+                        <p>
+                            <strong>Use Cases:</strong>
+                            <ul style="margin-top: 10px; padding-left: 20px; font-size: 0.9rem;">
+                                <li>Payment Routing: Connects Quarkus/Spring Boot services to Kafka/AMQ.</li>
+                                <li>Data Transformation: Converts between formats (JSON, XML, ISO 20022).</li>
+                                <li>Legacy Integration: Bridges modern and legacy systems.</li>
+                                <li>Error Handling: Implements dead letter queues for failed messages.</li>
+                            </ul>
+                        </p>
+                        <div class="tech-pills">
+                            <div class="tech-pill pill-camel">Red Hat Build of Apache Camel</div>
+                            <div class="tech-pill pill-openshift">OpenShift</div>
+                        </div>
+                    </div>
+                    <!-- CI/CD Pipeline Card -->
+                    <div class="architecture-card">
+                        <h4><i class="fas fa-code-branch"></i> CI/CD Pipeline</h4>
+                        <p>
+                            Automated pipeline for building, testing, and deploying Quarkus/Spring Boot and Red Hat Build of Apache Camel components on OpenShift.
+                        </p>
+                        <p>
+                            <strong>Key Components:</strong>
+                            <ul style="margin-top: 10px; padding-left: 20px; font-size: 0.9rem;">
+                                <li><strong>Git:</strong> Source code and IaC templates.</li>
+                                <li><strong>Jenkins:</strong> CI server for builds, tests, and Docker packaging.</li>
+                                <li><strong>ArgoCD:</strong> GitOps-based CD for OpenShift.</li>
+                                <li><strong>Camel K Operator:</strong> Manages Camel integrations on OpenShift.</li>
+                                <li><strong>Templating:</strong> Configuration management for environments.</li>
+                                <li><strong>Platform as Code:</strong> Infrastructure defined as code.</li>
+                            </ul>
+                        </p>
+                        <div class="tech-pills">
+                            <div class="tech-pill pill-cicd">Jenkins</div>
+                            <div class="tech-pill pill-cicd">ArgoCD</div>
+                            <div class="tech-pill pill-camel">Camel K Operator</div>
+                        </div>
+                    </div>
+                    <!-- Camel Tools Card -->
+                    <div class="architecture-card">
+                        <h4><i class="fas fa-tools"></i> Camel Tools</h4>
+                        <p>
+                            <strong>Development and Management Tools:</strong>
+                            Red Hat provides a comprehensive set of tools for developing, managing, and monitoring Camel integrations.
+                        </p>
+                        <p>
+                            <strong>Key Tools:</strong>
+                            <ul style="margin-top: 10px; padding-left: 20px; font-size: 0.9rem;">
+                                <li><strong>Kaoto Visual Designer:</strong> Drag-and-drop interface for designing integration flows.</li>
+                                <li><strong>HawtIO Diagnostic Console:</strong> Web-based console for monitoring and managing Camel routes.</li>
+                                <li><strong>Camel CLI:</strong> Command-line interface for managing Camel applications.</li>
+                                <li><strong>Camel for Spring Boot:</strong> Integration with Spring Boot applications.</li>
+                                <li><strong>OpenShift Integration:</strong> Native deployment and management on OpenShift.</li>
+                            </ul>
+                        </p>
+                        <div class="tech-pills">
+                            <div class="tech-pill pill-tools">Kaoto</div>
+                            <div class="tech-pill pill-tools">HawtIO</div>
+                            <div class="tech-pill pill-tools">Camel CLI</div>
+                            <div class="tech-pill pill-camel">Camel for Spring Boot</div>
+                        </div>
+                    </div>
+                    <!-- Dynatrace Card -->
+                    <div class="architecture-card">
+                        <h4><i class="fas fa-chart-line"></i> Dynatrace: Monitoring and Observability</h4>
+                        <p>
+                            <strong>Why Dynatrace?</strong>
+                            Dynatrace provides full-stack observability with AI-powered anomaly detection, real-time metrics, and distributed tracing.
+                        </p>
+                        <p>
+                            <strong>Key Features:</strong>
+                            <ul style="margin-top: 10px; padding-left: 20px; font-size: 0.9rem;">
+                                <li><strong>Automatic Discovery:</strong> Detects services, dependencies, and performance bottlenecks.</li>
+                                <li><strong>AI-Powered Analytics:</strong> Identifies anomalies and root causes in real time.</li>
+                                <li><strong>OpenShift Integration:</strong> Monitors pods, nodes, and cluster health.</li>
+                                <li><strong>Security Monitoring:</strong> Detects vulnerabilities and compliance violations.</li>
+                            </ul>
+                        </p>
+                        <div class="tech-pills">
+                            <div class="tech-pill pill-dynatrace">Dynatrace</div>
+                            <div class="tech-pill pill-openshift">OpenShift</div>
+                        </div>
+                    </div>
+                    <!-- Prometheus/Grafana Card -->
+                    <div class="architecture-card">
+                        <h4><i class="fas fa-tachometer-alt"></i> Prometheus/Grafana: Metrics and Visualization</h4>
+                        <p>
+                            <strong>Why Prometheus/Grafana?</strong>
+                            Prometheus collects metrics, while Grafana visualizes them for real-time monitoring and alerting.
+                        </p>
+                        <p>
+                            <strong>Key Features:</strong>
+                            <ul style="margin-top: 10px; padding-left: 20px; font-size: 0.9rem;">
+                                <li><strong>Prometheus:</strong> Pull-based metrics collection with alerting.</li>
+                                <li><strong>Grafana:</strong> Custom dashboards for metrics visualization.</li>
+                                <li><strong>OpenShift Integration:</strong> Native support for Kubernetes and Camel metrics.</li>
+                                <li><strong>Alerting:</strong> Configurable alerts for performance and availability.</li>
+                            </ul>
+                        </p>
+                        <div class="tech-pills">
+                            <div class="tech-pill pill-monitoring">Prometheus</div>
+                            <div class="tech-pill pill-monitoring">Grafana</div>
+                        </div>
+                    </div>
+                    <!-- How They Work Together -->
+                    <div class="architecture-card" style="grid-column: 1 / -1; margin-top: 20px;">
+                        <h4><i class="fas fa-cogs"></i> How Quarkus/Spring Boot, Red Hat Build of Apache Camel, OpenShift, and Monitoring Work Together</h4>
+                        <p>
+                            The architecture combines Quarkus/Spring Boot, Red Hat Build of Apache Camel, OpenShift, Dynatrace, Prometheus/Grafana, and CI/CD for a scalable, observable, and automated critical platform.
+                        </p>
+                        <ul style="margin-top: 10px; padding-left: 20px;">
+                            <li>
+                                <strong>Quarkus/Spring Boot:</strong> Implements business logic (e.g., payment processing, transaction management).
+                            </li>
+                            <li>
+                                <strong>Red Hat Build of Apache Camel:</strong> Routes and transforms data between services, Kafka/AMQ, and external systems.
+                            </li>
+                            <li>
+                                <strong>OpenShift:</strong> Orchestrates containers, scaling, and CI/CD pipelines.
+                            </li>
+                            <li>
+                                <strong>Camel Tools:</strong> Kaoto for visual design, HawtIO for monitoring, CLI for management.
+                            </li>
+                            <li>
+                                <strong>Dynatrace/Prometheus/Grafana:</strong> Monitors performance, security, and compliance across the platform.
+                            </li>
+                            <li>
+                                <strong>CI/CD:</strong> Automates builds, tests, and deployments using GitOps.
+                            </li>
+                        </ul>
+                        <p>
+                            <strong>End-to-End Flow:</strong>
+                            <pre style="background: #f4f4f4; padding: 10px; border-radius: 5px; font-size: 0.9rem; overflow-x: auto;">
+Developer ? Git ? Jenkins ? Docker ? ArgoCD ? OpenShift ?
+Quarkus/Spring Boot (Payment Service) ? Red Hat Build of Apache Camel (SWIFT Route) ? SWIFT Network ?
+Red Hat Build of Apache Camel (Response Route) ? Quarkus/Spring Boot (Audit Service) ? PostgreSQL (Audit Log)
+Dynatrace/Prometheus/Grafana monitor all steps in real time.</pre>
+                        </p>
+                    </div>
+                </div>
+            </section>
+            <!-- Apache Camel Comparison Section -->
+            <section id="camel-comparison" class="tab-content">
+                <h2><i class="fas fa-balance-scale"></i> Apache Camel Open-Source vs Red Hat Build of Apache Camel</h2>
+                <!-- Introduction -->
+                <div class="intro-text">
+                    <p>
+                        While both versions of Apache Camel provide powerful integration capabilities, they are designed for different needs.
+                        <strong>Apache Camel open-source</strong> is ideal for developers and small projects, while
+                        <strong>Red Hat Build of Apache Camel</strong> is tailored for enterprises requiring stability, security, and support.
+                    </p>
+                    <p>
+                        Below is a concise comparison to help you choose the right version for your needs.
+                    </p>
+                </div>
+                <!-- Comparison Table -->
+                <div class="comparison-table-container">
+                    <table class="comparison-table">
+                        <thead>
+                            <tr>
+                                <th>Feature</th>
+                                <th>Apache Camel Open-Source</th>
+                                <th>Red Hat Build of Apache Camel</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Source -->
+                            <tr>
+                                <td><strong>Source</strong></td>
+                                <td>Community-driven open-source project.</td>
+                                <td>Built from Apache Camel source by Red Hat, with enterprise enhancements.</td>
+                            </tr>
+                            <!-- Support -->
+                            <tr>
+                                <td><strong>Support</strong></td>
+                                <td>
+                                    <span class="con">? Community support only.</span><br>
+                                    No SLAs or guaranteed response times.
+                                </td>
+                                <td>
+                                    <span class="pro">? Full commercial support with SLAs.</span><br>
+                                    24/7 assistance, security patches, and bug fixes.
+                                </td>
+                            </tr>
+                            <!-- Testing & Certification -->
+                            <tr>
+                                <td><strong>Testing & Certification</strong></td>
+                                <td>Tested by the community.</td>
+                                <td>
+                                    <span class="pro">? Extensively tested, hardened, and certified.</span><br>
+                                    Validated for use with Red Hat OpenShift, AMQ, and Runtimes.
+                                </td>
+                            </tr>
+                            <!-- Packaging & Distribution -->
+                            <tr>
+                                <td><strong>Packaging & Distribution</strong></td>
+                                <td>Available on Maven Central.</td>
+                                <td>
+                                    Distributed via Red Hat’s Maven repositories.<br>
+                                    <span class="pro">? Pre-configured and tested dependencies.</span>
+                                </td>
+                            </tr>
+                            <!-- Lifecycle & Updates -->
+                            <tr>
+                                <td><strong>Lifecycle & Updates</strong></td>
+                                <td>Follows the community’s release cycle.</td>
+                                <td>
+                                    <span class="pro">? Defined long-term lifecycle with clear EOL dates.</span><br>
+                                    Regular updates and patches aligned with Red Hat’s product lifecycle.
+                                </td>
+                            </tr>
+                            <!-- Integration -->
+                            <tr>
+                                <td><strong>Integration</strong></td>
+                                <td>Works with any Kubernetes platform.</td>
+                                <td>
+                                    <span class="pro">? Optimized for OpenShift.</span><br>
+                                    Includes Camel K Operator, S2I workflows, and OpenShift-specific tools.
+                                </td>
+                            </tr>
+                            <!-- Security -->
+                            <tr>
+                                <td><strong>Security</strong></td>
+                                <td>Basic security features.</td>
+                                <td>
+                                    <span class="pro">? Enterprise-grade security.</span><br>
+                                    Regular CVE patches, vulnerability scans, and compliance certifications.
+                                </td>
+                            </tr>
+                            <!-- Performance -->
+                            <tr>
+                                <td><strong>Performance</strong></td>
+                                <td>Good performance, but no vendor-specific optimizations.</td>
+                                <td>
+                                    <span class="pro">? Optimized for cloud-native environments.</span><br>
+                                    Tested and tuned for Quarkus, Spring Boot, and OpenShift.
+                                </td>
+                            </tr>
+                            <!-- Tooling -->
+                            <tr>
+                                <td><strong>Tooling</strong></td>
+                                <td>Basic tooling (e.g., Camel CLI, Maven plugins).</td>
+                                <td>
+                                    <span class="pro">? Enterprise-grade tooling.</span><br>
+                                    Kaoto (visual designer), HawtIO (monitoring), Camel JBang (CLI).
+                                </td>
+                            </tr>
+                            <!-- Observability -->
+                            <tr>
+                                <td><strong>Observability</strong></td>
+                                <td>Basic logging and metrics.</td>
+                                <td>
+                                    <span class="pro">? Unified observability.</span><br>
+                                    Native integration with Prometheus, OpenTelemetry, and Grafana.
+                                </td>
+                            </tr>
+                            <!-- Migration -->
+                            <tr>
+                                <td><strong>Migration</strong></td>
+                                <td>No official migration tools.</td>
+                                <td>
+                                    <span class="pro">? Official migration tools.</span><br>
+                                    OpenRewrite for upgrading from older versions (e.g., Fuse 7).
+                                </td>
+                            </tr>
+                            <!-- Cost -->
+                            <tr>
+                                <td><strong>Cost</strong></td>
+                                <td>
+                                    <span class="pro">? Free and open-source.</span><br>
+                                    No licensing costs.
+                                </td>
+                                <td>
+                                    Subscription-based license.<br>
+                                    Cost justified by enterprise support and stability.
+                                </td>
+                            </tr>
+                            <!-- Use Cases -->
+                            <tr>
+                                <td><strong>Recommended Use Cases</strong></td>
+                                <td>
+                                    <ul style="margin: 5px 0; padding-left: 20px;">
+                                        <li>Internal projects or non-critical integrations.</li>
+                                        <li>Proof of Concepts (POCs) or prototypes.</li>
+                                        <li>Startups or small teams with limited budgets.</li>
+                                    </ul>
+                                </td>
+                                <td>
+                                    <ul style="margin: 5px 0; padding-left: 20px;">
+                                        <li>Critical enterprise applications (e.g., banking, healthcare).</li>
+                                        <li>Large-scale integrations with high availability requirements.</li>
+                                        <li>Environments requiring compliance (e.g., PCI-DSS, HIPAA).</li>
+                                    </ul>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!-- Key Differences -->
+                <div class="key-differences">
+                    <h3><i class="fas fa-info-circle"></i> Key Differences Explained</h3>
+                    <p>
+                        The primary difference between Apache Camel open-source and Red Hat Build of Apache Camel lies in how they are built, supported, and maintained:
+                    </p>
+                    <ul>
+                        <li>
+                            <strong>"Build of" Process:</strong>
+                            Red Hat builds Apache Camel from source in its own systems, ensuring verifiable provenance, security scanning, and repeatability.
+                            This process guarantees that every artifact is secure, reliable, and fully supported.
+                        </li>
+                        <li>
+                            <strong>Enterprise Enhancements:</strong>
+                            Red Hat adds enterprise-grade features, such as optimized OpenShift integration, unified observability, and migration tools.
+                            These enhancements are designed to meet the needs of large-scale, mission-critical environments.
+                        </li>
+                        <li>
+                            <strong>Support and Stability:</strong>
+                            Red Hat provides long-term support, clear lifecycle policies, and 24/7 assistance.
+                            This ensures stability and predictability for enterprise deployments, reducing the risk of downtime or disruptions.
+                        </li>
+                    </ul>
+                </div>
+                <!-- Recommendation -->
+                <div class="recommendation">
+                    <h3><i class="fas fa-thumbs-up"></i> Our Recommendation</h3>
+                    <p>
+                        Choosing between Apache Camel open-source and Red Hat Build of Apache Camel depends on your organization’s needs, budget, and requirements.
+                        Here’s our recommendation:
+                    </p>
+                    <div class="recommendation-grid">
+                        <div class="recommendation-item">
+                            <h4><i class="fas fa-check-circle pro"></i> Choose Apache Camel Open-Source if:</h4>
+                            <ul>
+                                <li>You are working on a <strong>non-critical project</strong> (e.g., internal tools, POCs, prototypes).</li>
+                                <li>Your team has the <strong>expertise to manage and troubleshoot</strong> integrations without vendor support.</li>
+                                <li>You need a <strong>free solution</strong> with no licensing costs.</li>
+                                <li>You are comfortable with <strong>community support</strong> and do not require SLAs.</li>
+                            </ul>
+                        </div>
+                        <div class="recommendation-item">
+                            <h4><i class="fas fa-check-circle pro"></i> Choose Red Hat Build of Apache Camel if:</h4>
+                            <ul>
+                                <li>You are building a <strong>critical enterprise application</strong> (e.g., banking, healthcare, government).</li>
+                                <li>You need <strong>24/7 support, SLAs, and security patches</strong> for production environments.</li>
+                                <li>You are using <strong>OpenShift or other Red Hat products</strong> (e.g., Red Hat AMQ, Fuse).</li>
+                                <li>You require <strong>enterprise-grade observability, monitoring, and tooling</strong>.</li>
+                                <li>You need <strong>certified connectors</strong> for enterprise systems (e.g., SAP, IBM MQ).</li>
+                                <li>You are migrating from <strong>older versions (e.g., Fuse 7)</strong> and need migration tools.</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="hybrid-approach">
+                        <h4><i class="fas fa-cogs"></i> Hybrid Approach:</h4>
+                        <p>
+                            Some organizations may benefit from a <strong>hybrid approach</strong>, where:
+                        </p>
+                        <ul>
+                            <li>Apache Camel open-source is used for <strong>non-critical integrations or development environments</strong>.</li>
+                            <li>Red Hat Build of Apache Camel is used for <strong>production-critical paths and enterprise integrations</strong>.</li>
+                            <li>Red Hat’s migration tools (e.g., OpenRewrite) are used to <strong>gradually transition</strong> from open-source to enterprise.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+        </main>
+        <footer>
+            <p>Critical Platform Architecture with Red Hat Build of Apache Camel | Designed for Enterprise Integration</p>
+        </footer>
+    </div>
+    <!-- Scripts for interactivity -->
+    <script>
+        // Initialize Mermaid with optimized settings
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            fontFamily: "'Roboto', 'Segoe UI', sans-serif",
+            fontSize: '14px',
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis',
+                nodeSpacing: 30,
+                rankSpacing: 50,
+            },
+        });
+
+        // Track active toggles
+        let monitoringVisible = true;
+        let externalVisible = true;
+        let cicdVisible = true;
+
+        // Toggle layer visibility
+        function toggleLayer(layerClass, button) {
+            const nodes = document.querySelectorAll(`.mermaid .${layerClass}`);
+            nodes.forEach(node => {
+                node.classList.toggle('hidden');
+            });
+            button.classList.toggle('active');
+            if (layerClass === 'monitoring') monitoringVisible = !monitoringVisible;
+            if (layerClass === 'external') externalVisible = !externalVisible;
+            if (layerClass === 'cicd') cicdVisible = !cicdVisible;
+        }
+
+        // Highlight Apache Camel nodes
+        function highlightCamel() {
+            document.querySelectorAll('.mermaid .node').forEach(n => {
+                n.style.filter = 'none';
+                n.style.strokeWidth = '2px';
+            });
+            document.querySelectorAll('.mermaid .node.integration').forEach(n => {
+                n.style.filter = 'drop-shadow(0 0 5px rgba(255, 152, 0, 0.7))';
+                n.style.strokeWidth = '3px';
+            });
+        }
+
+        // Add tooltips to nodes
+        function addTooltips() {
+            const nodes = document.querySelectorAll('.mermaid .node');
+            nodes.forEach(node => {
+                const text = node.querySelector('text')?.textContent || '';
+                node.setAttribute('title', text.replace(/\n/g, ' '));
+                node.style.cursor = 'pointer';
+            });
+        }
+
+        // Initialize after DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            addTooltips();
+
+            // Initialize svg-pan-zoom after Mermaid renders the diagram
+            const checkDiagram = setInterval(() => {
+                const diagram = document.querySelector('#globalDiagram svg');
+                if (diagram) {
+                    clearInterval(checkDiagram);
+                    const panZoom = svgPanZoom(diagram, {
+                        zoomEnabled: true,
+                        controlIconsEnabled: true,
+                        fit: true,
+                        center: true,
+                        minZoom: 0.5,
+                        maxZoom: 5,
+                        beforeZoom: function() { return true; },
+                        beforePan: function() { return true; }
+                    });
+
+                    // Custom zoom buttons
+                    document.getElementById('zoomInBtn').addEventListener('click', () => {
+                        panZoom.zoomIn();
+                    });
+                    document.getElementById('zoomOutBtn').addEventListener('click', () => {
+                        panZoom.resetZoom();
+                        panZoom.fit();
+                        panZoom.center();
+                    });
+
+                    // Layer toggle buttons
+                    document.getElementById('toggleMonitoringBtn').addEventListener('click', () => toggleLayer('monitoring', document.getElementById('toggleMonitoringBtn')));
+                    document.getElementById('toggleExternalBtn').addEventListener('click', () => toggleLayer('external', document.getElementById('toggleExternalBtn')));
+                    document.getElementById('toggleCICDBtn').addEventListener('click', () => toggleLayer('cicd', document.getElementById('toggleCICDBtn')));
+                    document.getElementById('highlightCamelBtn').addEventListener('click', highlightCamel);
+                }
+            }, 500);
+
+            // Tab navigation
+            const tabButtons = document.querySelectorAll('.tab-button');
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const tabId = button.getAttribute('data-tab');
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    tabContents.forEach(content => content.classList.remove('active'));
+                    document.getElementById(tabId).classList.add('active');
+                    window.scrollTo({ top: document.querySelector('main').offsetTop, behavior: 'smooth' });
+                });
+            });
+
+            // Smooth scrolling for navigation links
+            document.querySelectorAll('nav a').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href');
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        if (targetId === '#camel-comparison') {
+                            document.querySelector('[data-tab="camel-comparison"]').click();
+                        } else if (targetId === '#global') {
+                            document.querySelector('[data-tab="global"]').click();
+                        }
+                        window.scrollTo({ top: targetElement.offsetTop - 80, behavior: 'smooth' });
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
