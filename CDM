@@ -1,0 +1,635 @@
+{
+  "$schema": "cdm-payment-2.0.0",
+  "metadata": {
+    "id": "cdm-pmt-123e4567-e89b-12d3-a456-426614174000",
+    "version": "2.0.0",
+    "originalFormat": "PACS.008.001.08",
+    "originalMessageId": "MSG1234567890",
+    "transformationDate": "2024-01-15T10:30:00.000Z",
+    "sourceSystem": "SWIFTNET",
+    "destinationSystem": "CORE_BANKING",
+    "environment": "production",
+    "batch": false,
+    "test": false,
+    "schemaVersion": "2.0.0"
+  },
+
+  "business": {
+    "header": {
+      "messageId": "cdm-pmt-123e4567-e89b-12d3-a456-426614174000",
+      "creationDateTime": "2024-01-15T10:30:00.000Z",
+      "initiatingParty": {
+        "bic": "BANKFRPPXXX",
+        "name": "BANK OF FRANCE",
+        "country": "FR",
+        "branch": "PARIS MAIN"
+      },
+      "protocol": {
+        "type": "ISO20022",
+        "family": "PACS",
+        "version": "008.001.08",
+        "messageType": "CREDIT_TRANSFER",
+        "businessDomain": "CROSS_BORDER"
+      }
+    },
+
+    "transaction": {
+      "id": "TX-20240115-123456",
+      "endToEndId": "E2E-REF-1234567890",
+      "instructionId": "INSTR-9876543210",
+      "status": "PENDING",
+      "type": "CROSS_BORDER",
+      "category": "CORPORATE_PAYMENT",
+      "priority": "URGENT",
+
+      "amount": {
+        "instructed": {
+          "value": "150000.00",
+          "currency": "EUR"
+        },
+        "equivalent": {
+          "value": "162000.00",
+          "currency": "USD",
+          "exchangeRate": "1.0800",
+          "rateDate": "2024-01-15",
+          "rateSource": "ECB"
+        },
+        "settlement": {
+          "value": "150000.00",
+          "currency": "EUR",
+          "method": "RTGS"
+        }
+      },
+
+      "dates": {
+        "creation": "2024-01-15T10:30:00Z",
+        "executionRequested": "2024-01-16T00:00:00Z",
+        "executionActual": null,
+        "value": "2024-01-16",
+        "acceptance": null,
+        "rejection": null,
+        "settlement": null
+      },
+
+      "parties": {
+        "debtor": {
+          "type": "ORGANIZATION",
+          "name": "COMPANY XYZ SARL",
+          "address": {
+            "street": "25 RUE DE LA PAIX",
+            "city": "PARIS",
+            "postalCode": "75002",
+            "country": "FR",
+            "countryCode": "FR"
+          },
+          "account": {
+            "iban": "FR7630001007941234567890185",
+            "bban": "30001007941234567890185",
+            "currency": "EUR",
+            "type": "CURRENT"
+          },
+          "agent": {
+            "bic": "SOGEFRPPXXX",
+            "name": "SOCIETE GENERALE",
+            "country": "FR",
+            "role": "DEBTOR_AGENT"
+          }
+        },
+
+        "creditor": {
+          "type": "PERSON",
+          "name": "JOHN DOE",
+          "address": {
+            "street": "HAUPTSTRASSE 123",
+            "city": "BERLIN",
+            "postalCode": "10115",
+            "country": "DE",
+            "countryCode": "DE"
+          },
+          "account": {
+            "iban": "DE89370400440532013000",
+            "bban": "370400440532013000",
+            "currency": "EUR",
+            "type": "SAVINGS"
+          },
+          "agent": {
+            "bic": "DEUTDEFFXXX",
+            "name": "DEUTSCHE BANK AG",
+            "country": "DE",
+            "role": "CREDITOR_AGENT"
+          }
+        },
+
+        "intermediaries": [
+          {
+            "sequence": 1,
+            "bic": "CHASUS33XXX",
+            "name": "JPMORGAN CHASE BANK",
+            "country": "US",
+            "account": "US12345678901234567890",
+            "role": "INTERMEDIARY",
+            "fee": "15.00 EUR"
+          }
+        ],
+
+        "ultimateParties": {
+          "debtor": {
+            "name": "COMPANY XYZ HOLDING",
+            "type": "ORGANIZATION"
+          },
+          "creditor": {
+            "name": "JANE DOE",
+            "type": "PERSON"
+          }
+        }
+      },
+
+      "details": {
+        "purpose": "COMMERCIAL_PAYMENT",
+        "categoryPurpose": "CORT",
+        "serviceLevel": "URGP",
+        "localInstrument": "SEPA_CREDIT_TRANSFER",
+        "chargeBearer": "SHAR",
+        
+        "remittance": {
+          "unstructured": "INVOICE 12345 - SUPPLIER PAYMENT FOR Q1 2024",
+          "structured": [
+            {
+              "type": "CRED",
+              "reference": "INV-12345",
+              "date": "2024-01-10",
+              "amount": "150000.00",
+              "currency": "EUR"
+            }
+          ]
+        },
+
+        "regulatory": {
+          "purposeCode": "COMC",
+          "reporting": [
+            {
+              "type": "AML",
+              "code": "CTR",
+              "amount": "150000.00",
+              "currency": "EUR",
+              "threshold": "10000.00"
+            }
+          ],
+          "complianceStatus": "PENDING"
+        },
+
+        "fees": {
+          "total": "25.00",
+          "currency": "EUR",
+          "breakdown": [
+            {
+              "type": "COMMISSION",
+              "amount": "25.00",
+              "currency": "EUR",
+              "bearer": "DEBT",
+              "description": "Processing fee"
+            }
+          ]
+        }
+      },
+
+      "routing": {
+        "channel": "RTGS",
+        "network": "SWIFT",
+        "corridor": "EU_US",
+        "priority": "URGENT",
+        "instructions": "DO_NOT_ROUTE_VIA_RUSSIA",
+        
+        "route": [
+          {
+            "sequence": 1,
+            "bic": "BANKFRPPXXX",
+            "name": "BANK OF FRANCE",
+            "action": "ORIGINATE",
+            "country": "FR"
+          },
+          {
+            "sequence": 2, 
+            "bic": "CHASUS33XXX",
+            "name": "JPMORGAN CHASE BANK",
+            "action": "INTERMEDIATE",
+            "country": "US"
+          },
+          {
+            "sequence": 3,
+            "bic": "DEUTDEFFXXX",
+            "name": "DEUTSCHE BANK AG",
+            "action": "BENEFICIARY",
+            "country": "DE"
+          }
+        ]
+      }
+    }
+  },
+
+  "technical": {
+    "processing": {
+      "status": "VALIDATING",
+      "subStatus": "SCHEMA_VALIDATION",
+      "previousStatus": "TRANSFORMED",
+      "nextExpectedStatus": "BUSINESS_VALIDATION",
+      
+      "workflow": {
+        "name": "CROSS_BORDER_PAYMENT",
+        "version": "2.1.0",
+        "currentStep": "validation",
+        "totalSteps": 8,
+        "stepSequence": 3
+      },
+      
+      "timestamps": {
+        "received": "2024-01-15T10:28:15.123Z",
+        "transformationStart": "2024-01-15T10:29:00.456Z",
+        "transformationEnd": "2024-01-15T10:30:00.789Z",
+        "validationStart": "2024-01-15T10:30:01.012Z",
+        "lastUpdate": "2024-01-15T10:30:05.345Z",
+        "timeInSystem": 5034
+      },
+      
+      "stateMachine": {
+        "currentState": "VALIDATING",
+        "previousState": "TRANSFORMING",
+        "nextState": "ROUTING",
+        "stateHistory": [
+          {
+            "state": "RECEIVED",
+            "timestamp": "2024-01-15T10:28:15.123Z",
+            "service": "connector-service",
+            "host": "connector-pod-1",
+            "durationMs": 120
+          },
+          {
+            "state": "TRANSFORMING",
+            "timestamp": "2024-01-15T10:29:00.456Z",
+            "service": "transformation-service",
+            "host": "transformer-pod-3",
+            "durationMs": 1050
+          }
+        ]
+      },
+      
+      "qualityOfService": {
+        "priority": "HIGH",
+        "timeoutMs": 30000,
+        "retryCount": 0,
+        "maxRetries": 3,
+        "deadline": "2024-01-15T10:35:00.000Z"
+      }
+    },
+
+    "routing": {
+      "engine": {
+        "version": "3.2.1",
+        "name": "dynamic-router",
+        "executionId": "route-decision-987654",
+        "executionTimestamp": "2024-01-15T10:30:03.000Z"
+      },
+      
+      "rules": {
+        "evaluated": [
+          {
+            "ruleId": "RULE-EUR-HIGH-VALUE",
+            "name": "High Value EUR Payment",
+            "condition": "amount > 10000 AND currency = 'EUR'",
+            "action": "PRIORITY_HANDLING",
+            "priority": "HIGH",
+            "matched": true,
+            "score": 0.95,
+            "executionTimeMs": 12
+          },
+          {
+            "ruleId": "RULE-CROSS-BORDER",
+            "name": "Cross Border Payment",
+            "condition": "debtorCountry != creditorCountry",
+            "action": "SWIFT_ROUTING",
+            "priority": "MEDIUM",
+            "matched": true,
+            "score": 1.0,
+            "executionTimeMs": 8
+          }
+        ],
+        
+        "summary": {
+          "totalRules": 15,
+          "matchedRules": 2,
+          "executionTimeMs": 45,
+          "confidence": 0.92
+        }
+      },
+      
+      "decision": {
+        "selectedRoute": "SWIFT_CORRIDOR_EU_US",
+        "routePriority": "URGENT",
+        "costEstimate": "25.00 EUR",
+        "estimatedSettlementTime": "2 hours",
+        "successProbability": 0.98,
+        "riskLevel": "LOW",
+        
+        "costBreakdown": [
+          {
+            "type": "SWIFT_FEE",
+            "amount": "15.00",
+            "currency": "EUR"
+          },
+          {
+            "type": "INTERMEDIARY_FEE",
+            "amount": "10.00",
+            "currency": "EUR"
+          }
+        ]
+      },
+      
+      "alternatives": [
+        {
+          "route": "SEPA_DIRECT",
+          "cost": "0.50 EUR",
+          "eta": "15 minutes",
+          "reason": "NOT_APPLICABLE",
+          "rejectionReason": "CROSS_BORDER"
+        }
+      ]
+    },
+
+    "audit": {
+      "identifiers": {
+        "traceId": "trace-123e4567-e89b-12d3-a456-426614174000",
+        "spanId": "span-789abcde-f123-4567-8901-234567890123",
+        "correlationId": "corr-9876543210",
+        "sessionId": "session-abcdef123456",
+        "userId": "service-account-payment"
+      },
+      
+      "access": {
+        "sourceIp": "192.168.1.100",
+        "userAgent": "Apache-HttpClient/4.5.13",
+        "clientId": "swift-gateway-prod",
+        "authenticatedUser": "service-account-swift",
+        "authenticationMethod": "MTLS",
+        "accessTimestamp": "2024-01-15T10:28:15.123Z"
+      },
+      
+      "changes": [
+        {
+          "field": "status",
+          "oldValue": "RECEIVED",
+          "newValue": "TRANSFORMING",
+          "timestamp": "2024-01-15T10:29:00.456Z",
+          "changedBy": "transformation-service",
+          "changeReason": "AUTO_TRANSFORMATION"
+        }
+      ],
+      
+      "compliance": {
+        "retentionPeriod": "7 years",
+        "archivingRequired": true,
+        "legalHold": false,
+        "auditTrailId": "audit-trail-123456"
+      }
+    },
+
+    "performance": {
+      "metrics": {
+        "transformationTimeMs": 1050,
+        "validationTimeMs": 2450,
+        "totalProcessingTimeMs": 3500,
+        "messageSizeBytes": 2048,
+        "memoryUsageKb": 512,
+        "cpuUsageMs": 150,
+        "throughput": 125
+      },
+      
+      "bottlenecks": [
+        {
+          "step": "XSD_VALIDATION",
+          "durationMs": 1200,
+          "thresholdMs": 1000,
+          "severity": "WARNING",
+          "recommendation": "Optimize XSD parsing"
+        }
+      ],
+      
+      "sla": {
+        "expectedProcessingTimeMs": 5000,
+        "actualProcessingTimeMs": 3500,
+        "slaStatus": "WITHIN_SLA",
+        "slaMarginMs": 1500
+      }
+    },
+
+    "logging": {
+      "configuration": {
+        "logLevel": "INFO",
+        "retentionDays": 30,
+        "indexedFields": ["traceId", "correlationId", "messageId"],
+        "samplingRate": 1.0
+      },
+      
+      "entries": [
+        {
+          "timestamp": "2024-01-15T10:28:15.123Z",
+          "level": "INFO",
+          "service": "connector-service",
+          "host": "connector-pod-1",
+          "message": "Message received from SWIFTNET",
+          "correlationId": "corr-9876543210",
+          "details": {
+            "source": "SWIFTNET",
+            "messageSize": "2048 bytes",
+            "protocol": "PACS.008"
+          }
+        }
+      ],
+      
+      "errors": {
+        "lastError": null,
+        "errorCount": 0,
+        "retryCount": 0,
+        "errorHistory": [],
+        "circuitBreaker": "CLOSED"
+      }
+    },
+
+    "security": {
+      "compliance": {
+        "amlCheck": "PENDING",
+        "sanctionsScreening": "PENDING",
+        "fraudDetection": "PENDING",
+        "riskLevel": "MEDIUM",
+        "riskScore": 65,
+        "requiredApprovals": 1
+      },
+      
+      "encryption": {
+        "encryptedAtRest": true,
+        "encryptionAlgorithm": "AES-256-GCM",
+        "keyId": "key-1234567890",
+        "keyVersion": "v1",
+        "encryptionDate": "2024-01-15T10:28:20.000Z",
+        "encryptionService": "vault-kms-prod"
+      },
+      
+      "accessControl": {
+        "allowedServices": ["validation-service", "routing-service", "processing-service"],
+        "permissions": ["READ", "WRITE", "VALIDATE"],
+        "dataClassification": "RESTRICTED",
+        "accessPolicies": ["PCI_DSS", "GDPR"],
+        "maskedFields": ["accountNumber", "personalData"]
+      }
+    },
+
+    "infrastructure": {
+      "scalability": {
+        "partitionKey": "EUR-20240116",
+        "shardId": "shard-3",
+        "processingGroup": "high-priority",
+        "loadBalancer": "lb-eu-west-1a",
+        "availabilityZone": "eu-west-1a"
+      },
+      
+      "resourceAllocation": {
+        "requiredCpu": "2 cores",
+        "requiredMemory": "1 GB",
+        "timeoutMs": 30000,
+        "retryPolicy": "exponential-backoff",
+        "maxRetries": 3,
+        "backoffMultiplier": 2
+      },
+      
+      "deployment": {
+        "cluster": "payment-cluster-prod",
+        "namespace": "payment-processing",
+        "pod": "processor-pod-7",
+        "node": "worker-node-3",
+        "region": "eu-west-1"
+      }
+    },
+
+    "integration": {
+      "microservices": {
+        "involvedServices": [
+          {
+            "name": "connector-service",
+            "version": "2.3.1",
+            "host": "connector-pod-1"
+          },
+          {
+            "name": "transformation-service",
+            "version": "1.8.0",
+            "host": "transformer-pod-3"
+          }
+        ],
+        "apiVersion": "1.0.0",
+        "protocol": "HTTP/REST"
+      },
+      
+      "externalSystems": {
+        "source": {
+          "system": "SWIFTNET",
+          "interface": "SWIFT_FIN",
+          "version": "7.0"
+        },
+        "destination": {
+          "system": "CORE_BANKING",
+          "interface": "SOAP",
+          "version": "3.2"
+        },
+        "intermediaries": [
+          {
+            "system": "CHASE_BANK",
+            "role": "INTERMEDIARY"
+          }
+        ]
+      },
+      
+      "messaging": {
+        "kafka": {
+          "topic": "payment-events-urgent",
+          "partition": 5,
+          "offset": 123456,
+          "consumerGroup": "payment-processor-group",
+          "key": "TX-20240115-123456"
+        },
+        "rabbitmq": {
+          "exchange": "payment.exchange",
+          "routingKey": "pacs.payment.eu"
+        }
+      }
+    },
+
+    "monitoring": {
+      "health": {
+        "status": "HEALTHY",
+        "lastCheck": "2024-01-15T10:29:30.000Z",
+        "responseTimeMs": 45,
+        "cpuUsage": 25.5,
+        "memoryUsage": 45.2
+      },
+      
+      "alerts": {
+        "triggered": [],
+        "subscribed": [
+          {
+            "name": "HIGH_VALUE",
+            "threshold": 10000,
+            "severity": "HIGH"
+          },
+          {
+            "name": "CROSS_BORDER",
+            "severity": "MEDIUM"
+          }
+        ],
+        "silenced": false
+      },
+      
+      "dashboard": {
+        "url": "https://monitoring.company.com/dashboard/payments/cdm-pmt-123e4567",
+        "refreshInterval": "30 seconds",
+        "customMetrics": [
+          "processing_time",
+          "success_rate",
+          "cost_per_transaction"
+        ]
+      },
+      
+      "tracing": {
+        "enabled": true,
+        "samplingRate": 1.0,
+        "exporters": ["jaeger", "prometheus"],
+        "traceUrl": "https://jaeger.company.com/trace/trace-123e4567"
+      }
+    }
+  },
+
+  "original": {
+    "format": "PACS",
+    "encoding": "UTF-8",
+    "compression": "NONE",
+    "checksum": "sha256:abc123def456ghi789jkl012mno345pqr678stu901vwx234yz567890",
+    "sizeBytes": 2048,
+    "lineCount": 45,
+    
+    "data": "Base64EncodedOriginalPacsMessage...",
+    
+    "source": {
+      "system": "SWIFTNET",
+      "filename": "pacs_message_1234567890.xml",
+      "fileSize": 2048,
+      "receptionDate": "2024-01-15T10:28:15Z",
+      "channel": "SWIFT_FIN",
+      "session": "123456",
+      "sequence": "7890"
+    },
+    
+    "validation": {
+      "schemaValid": true,
+      "wellFormed": true,
+      "signatureValid": true,
+      "checksumValid": true
+    }
+  }
+}
